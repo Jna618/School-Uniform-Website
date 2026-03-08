@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard – Galaxy Uniforms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1F3C;
+    --navy-mid: #1A3358;
+    --navy-light: #2A4A7A;
+    --navy-pale: #EEF2F8;
+    --gold: #E8A020;
+    --gold-light: #F5C050;
+    --gold-pale: rgba(232,160,32,0.10);
+    --white: #FFFFFF;
+    --sidebar-bg: #0A1828;
+    --sidebar-border: rgba(255,255,255,0.07);
+    --gray-50: #F8F9FA;
+    --gray-100: #F0F2F5;
+    --gray-200: #E4E8ED;
+    --gray-300: #CBD0D8;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --red: #E03C31;
+    --red-pale: rgba(224,60,49,0.09);
+    --green: #1A7A4A;
+    --green-pale: rgba(26,122,74,0.09);
+    --blue: #1565C0;
+    --blue-pale: rgba(21,101,192,0.09);
+    --amber: #B45309;
+    --amber-pale: rgba(180,83,9,0.09);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg: 0 10px 36px rgba(0,0,0,0.14);
+    --radius: 12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--gray-100); color: var(--navy); display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px; flex-shrink: 0; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
+    border-right: 1px solid var(--sidebar-border);
+  }
+  .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sidebar-logo-icon svg { width: 18px; height: 18px; }
+  .sidebar-logo-text { }
+  .sidebar-logo-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 800; color: var(--white); }
+  .sidebar-logo-sub { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 1.5px; text-transform: uppercase; }
+
+  .sidebar-section { padding: 16px 12px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.28); }
+  .sidebar-nav { padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,0.55);
+    cursor: pointer; transition: all .18s; text-decoration: none; position: relative;
+  }
+  .sidebar-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+  .sidebar-item.active { background: rgba(232,160,32,0.15); color: var(--gold-light); font-weight: 700; }
+  .sidebar-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--gold); border-radius: 0 3px 3px 0; }
+  .sidebar-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+  .sidebar-badge { margin-left: auto; background: var(--red); color: white; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; }
+  .sidebar-badge.gold { background: var(--gold); color: var(--navy); }
+
+  .sidebar-divider { border: none; border-top: 1px solid var(--sidebar-border); margin: 8px 12px; }
+  .sidebar-user { padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--sidebar-border); margin-top: auto; }
+  .sidebar-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--navy); flex-shrink: 0; font-family: 'Playfair Display', serif; }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+  /* ── MAIN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* top bar */
+  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 28px; height: 62px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .topbar-date { font-size: 12px; color: var(--gray-500); background: var(--gray-100); padding: 4px 10px; border-radius: 6px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-btn { height: 36px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--gray-200); background: var(--white); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--navy); display: flex; align-items: center; gap: 6px; transition: all .15s; }
+  .topbar-btn:hover { border-color: var(--navy); background: var(--gray-50); }
+  .topbar-btn.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .topbar-btn.primary:hover { background: var(--navy-light); }
+  .topbar-notif { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--gray-200); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; font-size: 16px; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 1.5px solid white; }
+
+  /* scrollable content */
+  .content { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
+
+  /* ── KPI CARDS ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card {
+    background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200);
+    padding: 20px 22px; box-shadow: var(--shadow-sm); transition: all .2s; cursor: default;
+  }
+  .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .kpi-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+  .kpi-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .kpi-icon.revenue { background: var(--gold-pale); }
+  .kpi-icon.orders { background: var(--blue-pale); }
+  .kpi-icon.schools { background: var(--green-pale); }
+  .kpi-icon.inventory { background: var(--amber-pale); }
+  .kpi-trend { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; display: flex; align-items: center; gap: 3px; }
+  .kpi-trend.up { background: var(--green-pale); color: var(--green); }
+  .kpi-trend.down { background: var(--red-pale); color: var(--red); }
+  .kpi-trend.neutral { background: var(--gray-100); color: var(--gray-500); }
+  .kpi-value { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 800; color: var(--navy); line-height: 1; margin-bottom: 5px; }
+  .kpi-label { font-size: 13px; color: var(--gray-500); font-weight: 500; }
+  .kpi-sub { font-size: 11px; color: var(--gray-400); margin-top: 3px; }
+
+  /* ── TWO COL GRID ── */
+  .two-col { display: grid; grid-template-columns: 1fr 380px; gap: 16px; margin-bottom: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* ── PANEL ── */
+  .panel { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 7px; }
+  .panel-title-icon { font-size: 15px; }
+  .panel-actions { display: flex; align-items: center; gap: 8px; }
+  .panel-btn { font-size: 12px; font-weight: 600; color: var(--navy); background: var(--gray-100); border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .15s; }
+  .panel-btn:hover { background: var(--gray-200); }
+  .panel-btn.primary { background: var(--navy); color: white; }
+  .panel-body { padding: 18px 20px; }
+  .panel-body.no-pad { padding: 0; }
+
+  /* ── REVENUE CHART ── */
+  .chart-wrap { position: relative; height: 200px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 100%; padding-bottom: 24px; }
+  .chart-bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; justify-content: flex-end; }
+  .chart-bar {
+    width: 100%; border-radius: 5px 5px 0 0; cursor: pointer; transition: opacity .15s; position: relative;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .chart-bar:hover { opacity: 0.8; }
+  .chart-bar:hover::after {
+    content: attr(data-val);
+    position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
+    background: var(--navy); color: white; font-size: 10px; font-weight: 700;
+    padding: 3px 7px; border-radius: 5px; white-space: nowrap;
+  }
+  .chart-bar.current { background: var(--navy); }
+  .chart-bar.prev { background: var(--gray-200); }
+  .chart-bar.bts { background: var(--gold); }
+  .chart-label { font-size: 9px; color: var(--gray-400); font-weight: 600; text-align: center; }
+  .chart-legend { display: flex; gap: 14px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray-500); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .chart-yaxis { position: absolute; left: 0; top: 0; bottom: 24px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+  .chart-yaxis-label { font-size: 9px; color: var(--gray-300); font-weight: 600; }
+  .chart-gridline { position: absolute; left: 0; right: 0; height: 1px; background: var(--gray-100); }
+
+  /* ── ORDERS TABLE ── */
+  .orders-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .orders-table th { background: var(--gray-50); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--gray-500); letter-spacing: 0.4px; text-transform: uppercase; border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+  .orders-table td { padding: 12px 14px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
+  .orders-table tr:last-child td { border-bottom: none; }
+  .orders-table tr:hover td { background: var(--gray-50); }
+  .orders-table .order-id { font-weight: 700; color: var(--navy); font-size: 12px; }
+  .orders-table .customer { font-weight: 600; color: var(--navy); }
+  .orders-table .amount { font-weight: 700; color: var(--navy); }
+  .status-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 6px; white-space: nowrap; }
+  .s-new { background: var(--blue-pale); color: var(--blue); }
+  .s-processing { background: var(--amber-pale); color: var(--amber); }
+  .s-shipped { background: rgba(99,102,241,0.09); color: #4338CA; }
+  .s-delivered { background: var(--green-pale); color: var(--green); }
+  .s-embroidery { background: var(--gold-pale); color: #8A6000; }
+  .table-action { font-size: 11px; font-weight: 600; color: var(--navy); border: none; background: var(--gray-100); padding: 4px 9px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .15s; }
+  .table-action:hover { background: var(--gray-200); }
+
+  /* ── FULFILLMENT QUEUE ── */
+  .fulfill-list { display: flex; flex-direction: column; gap: 0; }
+  .fulfill-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--gray-100); transition: background .15s; }
+  .fulfill-item:last-child { border-bottom: none; }
+  .fulfill-item:hover { background: var(--gray-50); }
+  .fulfill-priority { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .priority-urgent { background: var(--red); }
+  .priority-normal { background: var(--gold); }
+  .priority-low { background: var(--gray-300); }
+  .fulfill-num { font-size: 12px; font-weight: 700; color: var(--navy); width: 80px; flex-shrink: 0; }
+  .fulfill-info { flex: 1; min-width: 0; }
+  .fulfill-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .fulfill-items { font-size: 11px; color: var(--gray-500); margin-top: 1px; }
+  .fulfill-school { font-size: 10px; color: var(--green); font-weight: 600; margin-top: 1px; display: flex; align-items: center; gap: 3px; }
+  .fulfill-tags { display: flex; gap: 5px; }
+  .fulfill-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .ft-emb { background: var(--gold-pale); color: #8A6000; }
+  .ft-bulk { background: var(--blue-pale); color: var(--blue); }
+  .ft-rush { background: var(--red-pale); color: var(--red); }
+  .fulfill-btn { font-size: 11px; font-weight: 700; color: white; background: var(--navy); border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .fulfill-btn:hover { background: var(--navy-light); }
+  .fulfill-btn.done { background: var(--green); }
+
+  /* ── INVENTORY ALERTS ── */
+  .inv-list { display: flex; flex-direction: column; gap: 0; }
+  .inv-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--gray-100); }
+  .inv-item:last-child { border-bottom: none; }
+  .inv-img { width: 36px; height: 36px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .inv-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .inv-sku { font-size: 10px; color: var(--gray-400); font-weight: 500; margin-top: 1px; }
+  .inv-stock { text-align: right; flex-shrink: 0; }
+  .inv-qty { font-size: 14px; font-weight: 800; }
+  .inv-qty.critical { color: var(--red); }
+  .inv-qty.low { color: var(--amber); }
+  .inv-qty.ok { color: var(--green); }
+  .inv-threshold { font-size: 10px; color: var(--gray-400); }
+  .inv-bar-wrap { width: 60px; height: 5px; background: var(--gray-200); border-radius: 3px; overflow: hidden; margin-left: 8px; flex-shrink: 0; }
+  .inv-bar { height: 100%; border-radius: 3px; }
+  .inv-bar.critical { background: var(--red); }
+  .inv-bar.low { background: var(--gold); }
+  .inv-bar.ok { background: var(--green); }
+  .inv-reorder { font-size: 11px; font-weight: 700; color: var(--navy); border: 1.5px solid var(--gray-300); background: white; padding: 4px 9px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* ── TOP SCHOOLS ── */
+  .schools-list { display: flex; flex-direction: column; gap: 0; }
+  .school-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .15s; }
+  .school-item:last-child { border-bottom: none; }
+  .school-item:hover { background: var(--gray-50); }
+  .school-rank { width: 20px; font-size: 12px; font-weight: 700; color: var(--gray-400); text-align: center; flex-shrink: 0; }
+  .school-rank.top { color: var(--gold); }
+  .school-avatar { width: 34px; height: 34px; border-radius: 8px; background: var(--navy-pale); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .school-name { font-size: 13px; font-weight: 600; color: var(--navy); flex: 1; }
+  .school-location { font-size: 11px; color: var(--gray-500); margin-top: 1px; }
+  .school-revenue { font-size: 13px; font-weight: 700; color: var(--navy); text-align: right; flex-shrink: 0; }
+  .school-orders { font-size: 11px; color: var(--gray-500); text-align: right; }
+  .school-bar-wrap { width: 50px; height: 4px; background: var(--gray-200); border-radius: 2px; overflow: hidden; }
+  .school-bar { height: 100%; background: var(--navy); border-radius: 2px; }
+
+  /* ── EMBROIDERY QUEUE ── */
+  .emb-queue { display: flex; flex-direction: column; gap: 0; }
+  .emb-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--gray-100); }
+  .emb-item:last-child { border-bottom: none; }
+  .emb-num { font-size: 12px; font-weight: 700; color: var(--navy); width: 84px; flex-shrink: 0; }
+  .emb-info { flex: 1; }
+  .emb-product { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .emb-detail { font-size: 11px; color: var(--gray-500); margin-top: 1px; }
+  .emb-school-tag { font-size: 10px; font-weight: 700; background: var(--gold-pale); color: #8A6000; padding: 2px 7px; border-radius: 4px; }
+  .emb-due { font-size: 11px; color: var(--gray-500); flex-shrink: 0; text-align: right; }
+  .emb-due.overdue { color: var(--red); font-weight: 700; }
+  .emb-status { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+
+  /* ── MINI STATS ── */
+  .mini-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mini-stat { background: var(--gray-50); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--gray-200); }
+  .mini-stat-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .mini-stat-label { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+  .mini-stat-trend { font-size: 10px; font-weight: 700; margin-top: 4px; }
+  .trend-up { color: var(--green); }
+  .trend-down { color: var(--red); }
+
+  /* ── ACTIVITY FEED ── */
+  .activity-list { display: flex; flex-direction: column; gap: 0; }
+  .activity-item { display: flex; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--gray-100); align-items: flex-start; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .ad-order { background: var(--blue); }
+  .ad-school { background: var(--green); }
+  .ad-inventory { background: var(--red); }
+  .ad-embroidery { background: var(--gold); }
+  .activity-text { font-size: 12px; color: var(--gray-700); line-height: 1.5; flex: 1; }
+  .activity-text strong { color: var(--navy); font-weight: 700; }
+  .activity-time { font-size: 10px; color: var(--gray-400); flex-shrink: 0; margin-top: 2px; }
+
+  /* ── SEARCH & FILTER BAR ── */
+  .table-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-bottom: 1px solid var(--gray-100); flex-wrap: wrap; }
+  .search-input { flex: 1; min-width: 180px; padding: 8px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; }
+  .search-input:focus { border-color: var(--navy); }
+  .filter-select { padding: 8px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; background: white; cursor: pointer; }
+  .filter-select:focus { border-color: var(--navy); }
+
+  /* ── BTS ALERT ── */
+  .bts-alert {
+    background: linear-gradient(90deg, rgba(232,160,32,0.12), rgba(232,160,32,0.06));
+    border: 1.5px solid var(--gold); border-radius: var(--radius);
+    padding: 14px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+  }
+  .bts-alert-icon { font-size: 22px; flex-shrink: 0; }
+  .bts-alert-text { flex: 1; font-size: 13px; color: var(--navy); }
+  .bts-alert-text strong { font-weight: 700; }
+  .bts-alert-btn { background: var(--navy); color: white; border: none; padding: 8px 16px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+
+  /* ── TABS ── */
+  .tab-row { display: flex; gap: 4px; padding: 0 20px; border-bottom: 1px solid var(--gray-100); }
+  .tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+  .tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+  .tab:hover:not(.active) { color: var(--navy); }
+
+  /* toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 999; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; transform: translateY(60px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .kpi-card { animation: fadeUp .4s ease both; }
+  .kpi-card:nth-child(1) { animation-delay: 0s; }
+  .kpi-card:nth-child(2) { animation-delay: .06s; }
+  .kpi-card:nth-child(3) { animation-delay: .12s; }
+  .kpi-card:nth-child(4) { animation-delay: .18s; }
+  .panel { animation: fadeUp .45s ease both; animation-delay: .1s; }
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="3" fill="#0D1F3C"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#0D1F3C" stroke-width="1.5" fill="none"/>
+      </svg>
+    </div>
+    <div class="sidebar-logo-text">
+      <div class="sidebar-logo-name">Galaxy</div>
+      <div class="sidebar-logo-sub">Admin Panel</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">Overview</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item active" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">📊</span> Dashboard
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">📦</span> Orders
+      <span class="sidebar-badge">14</span>
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">🧵</span> Embroidery Queue
+      <span class="sidebar-badge">8</span>
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">📋</span> Fulfillment
+      <span class="sidebar-badge">23</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">Catalog</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">👕</span> Products & SKUs
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">📦</span> Inventory
+      <span class="sidebar-badge" style="background:var(--amber); color:white;">3</span>
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">🏷️</span> Pricing & Discounts
+    </a>
+  </div>
+
+  <div class="sidebar-section">Schools & B2B</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">🏫</span> Partner Schools
+      <span class="sidebar-badge gold">2,041</span>
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">🛍️</span> School Storefronts
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">📝</span> Proposals & Quotes
+    </a>
+  </div>
+
+  <div class="sidebar-section">Customers</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">👤</span> Customer Accounts
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">⭐</span> Galaxy Rewards
+    </a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;">
+      <span class="sidebar-icon">💬</span> Customer Service
+      <span class="sidebar-badge">5</span>
+    </a>
+  </div>
+
+  <hr class="sidebar-divider">
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-analytics.html" class="sidebar-item" onclick="setActive(this); return false;"><span class="sidebar-icon">📈</span> Reports & Analytics</a>
+    <a href="#" class="sidebar-item" onclick="setActive(this); return false;"><span class="sidebar-icon">⚙️</span> Settings</a>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">JG</div>
+    <div>
+      <div class="sidebar-user-name">James G.</div>
+      <div class="sidebar-user-role">Owner / Admin</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-date">📅 Thursday, March 5, 2026</div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="showToast('Refreshing data...')">↻ Refresh</button>
+      <button class="topbar-btn" onclick="showToast('Exporting report...')">⬇ Export</button>
+      <div class="topbar-notif" onclick="showToast('3 new alerts')">🔔<div class="notif-dot"></div></div>
+      <button class="topbar-btn primary" onclick="showToast('Creating new order...')">+ New Order</button>
+    </div>
+  </div>
+
+  <!-- SCROLLABLE CONTENT -->
+  <div class="content">
+
+    <!-- BTS ALERT -->
+    <div class="bts-alert">
+      <div class="bts-alert-icon">🚀</div>
+      <div class="bts-alert-text">
+        <strong>Back-to-School 2026 season starts in 148 days.</strong> 
+        Last year you processed 4,200 orders in August alone. Begin inventory buildup and school outreach now to avoid stockouts.
+      </div>
+      <button class="bts-alert-btn" onclick="showToast('Opening BTS planning view...')">Plan BTS Season →</button>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon revenue">💰</div>
+          <div class="kpi-trend up">↑ 18%</div>
+        </div>
+        <div class="kpi-value">$84,210</div>
+        <div class="kpi-label">Revenue — MTD</div>
+        <div class="kpi-sub">vs $71,364 last month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon orders">📦</div>
+          <div class="kpi-trend up">↑ 12%</div>
+        </div>
+        <div class="kpi-value">1,284</div>
+        <div class="kpi-label">Orders — MTD</div>
+        <div class="kpi-sub">23 new today · 14 pending</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon schools">🏫</div>
+          <div class="kpi-trend up">↑ 34</div>
+        </div>
+        <div class="kpi-value">2,041</div>
+        <div class="kpi-label">Partner Schools</div>
+        <div class="kpi-sub">34 new this month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon inventory">⚠️</div>
+          <div class="kpi-trend down">3 critical</div>
+        </div>
+        <div class="kpi-value">3</div>
+        <div class="kpi-label">Inventory Alerts</div>
+        <div class="kpi-sub">Action needed today</div>
+      </div>
+    </div>
+
+    <!-- REVENUE CHART + MINI STATS -->
+    <div class="two-col">
+
+      <!-- Revenue Chart -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-title-icon">📈</span> Revenue — Last 12 Months</div>
+          <div class="panel-actions">
+            <button class="panel-btn">Monthly</button>
+            <button class="panel-btn">Weekly</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="chart-wrap">
+            <div class="chart-bars" id="revenueChart">
+              <!-- JS renders bars -->
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div> This Year</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--gray-200)"></div> Last Year</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Back-to-School Peak</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini Stats -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-title-icon">🎯</span> Key Metrics</div>
+          <button class="panel-btn">This Month</button>
+        </div>
+        <div class="panel-body">
+          <div class="mini-stat-grid">
+            <div class="mini-stat">
+              <div class="mini-stat-val">$65.54</div>
+              <div class="mini-stat-label">Avg Order Value</div>
+              <div class="mini-stat-trend trend-up">↑ 8% vs last month</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-val">34%</div>
+              <div class="mini-stat-label">Repeat Customers</div>
+              <div class="mini-stat-trend trend-up">↑ 4pts</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-val">2.4d</div>
+              <div class="mini-stat-label">Avg Ship Time</div>
+              <div class="mini-stat-trend trend-up">↓ 0.3d faster</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-val">2.1%</div>
+              <div class="mini-stat-label">Return Rate</div>
+              <div class="mini-stat-trend trend-down">↑ 0.3pts (sizing)</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-val">826</div>
+              <div class="mini-stat-label">Units w/ Embroidery</div>
+              <div class="mini-stat-trend trend-up">↑ 22% vs last month</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-val">$18.4k</div>
+              <div class="mini-stat-label">Embroidery Revenue</div>
+              <div class="mini-stat-trend trend-up">↑ 22%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT ORDERS (full table) -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-header">
+        <div class="panel-title"><span class="panel-title-icon">📦</span> Recent Orders</div>
+        <div class="panel-actions">
+          <button class="panel-btn">View All Orders →</button>
+        </div>
+      </div>
+      <div class="tab-row">
+        <div class="tab active" onclick="setTab(this)">All (1,284)</div>
+        <div class="tab" onclick="setTab(this)">Pending (14)</div>
+        <div class="tab" onclick="setTab(this)">Embroidery (8)</div>
+        <div class="tab" onclick="setTab(this)">Bulk / B2B (22)</div>
+        <div class="tab" onclick="setTab(this)">Returns (6)</div>
+      </div>
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍  Search by order #, customer, school...">
+        <select class="filter-select"><option>All Statuses</option><option>New</option><option>Processing</option><option>Embroidery</option><option>Shipped</option><option>Delivered</option></select>
+        <select class="filter-select"><option>All Schools</option><option>St. Mary's Academy</option><option>Lincoln Elementary</option><option>Holy Cross School</option></select>
+        <select class="filter-select"><option>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option></select>
+      </div>
+      <div class="panel-body no-pad">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>School</th>
+              <th>Items</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="order-id">#GU-20249102</span></td>
+              <td><span class="customer">Jennifer Torres</span><br><span style="font-size:11px;color:var(--gray-400)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4d276339223f3f283e0d28202c2421632e2220">[email&#160;protected]</a></span></td>
+              <td>St. Mary's Academy</td>
+              <td>7 items</td>
+              <td><span class="amount">$142.91</span></td>
+              <td><span class="status-pill s-embroidery">🧵 Embroidery</span></td>
+              <td>Mar 5, 2026</td>
+              <td><button class="table-action" onclick="window.location='galaxy-uniforms-order-detail.html'">View</button></td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#GU-20249098</span></td>
+              <td><span class="customer">Michael Chen</span><br><span style="font-size:11px;color:var(--gray-400)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="75185b161d101b351018141c195b161a18">[email&#160;protected]</a></span></td>
+              <td>Lincoln Elementary</td>
+              <td>12 items <span style="font-size:10px;color:var(--blue);font-weight:700;">BULK</span></td>
+              <td><span class="amount">$289.44</span></td>
+              <td><span class="status-pill s-processing">⏳ Processing</span></td>
+              <td>Mar 5, 2026</td>
+              <td><button class="table-action" onclick="window.location='galaxy-uniforms-order-detail.html'">View</button></td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#GU-20249091</span></td>
+              <td><span class="customer">Sarah Williams</span><br><span style="font-size:11px;color:var(--gray-400)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bdce93cad4d1d1fdd8d0dcd4d193ded2d0">[email&#160;protected]</a></span></td>
+              <td>Holy Cross School</td>
+              <td>4 items</td>
+              <td><span class="amount">$74.96</span></td>
+              <td><span class="status-pill s-new">✦ New</span></td>
+              <td>Mar 5, 2026</td>
+              <td><button class="table-action" onclick="window.location='galaxy-uniforms-order-detail.html'">View</button></td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#GU-20249085</span></td>
+              <td><span class="customer">David Kim</span><br><span style="font-size:11px;color:var(--gray-400)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c38723735311c39313d3530723f3331">[email&#160;protected]</a></span></td>
+              <td>JFK Middle School</td>
+              <td>3 items</td>
+              <td><span class="amount">$44.97</span></td>
+              <td><span class="status-pill s-shipped">✈ Shipped</span></td>
+              <td>Mar 4, 2026</td>
+              <td><button class="table-action" onclick="window.location='galaxy-uniforms-order-detail.html'">View</button></td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#GU-20249079</span></td>
+              <td><span class="customer">Amanda Ross</span><br><span style="font-size:11px;color:var(--gray-400)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="91f0bfe3fee2e2d1f4fcf0f8fdbff2fefc">[email&#160;protected]</a></span></td>
+              <td>Sacred Heart</td>
+              <td>9 items</td>
+              <td><span class="amount">$198.91</span></td>
+              <td><span class="status-pill s-delivered">✓ Delivered</span></td>
+              <td>Mar 3, 2026</td>
+              <td><button class="table-action" onclick="window.location='galaxy-uniforms-order-detail.html'">View</button></td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#GU-20249074</span></td>
+              <td><span class="customer">Robert Diaz</span><br><span style="font-size:11px;color:var(--gray-400)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="790b571d101803391c14181015571a1614">[email&#160;protected]</a></span></td>
+              <td>St. Francis Prep</td>
+              <td>2 items</td>
+              <td><span class="amount">$29.98</span></td>
+              <td><span class="status-pill s-new">✦ New</span></td>
+              <td>Mar 3, 2026</td>
+              <td><button class="table-action" onclick="window.location='galaxy-uniforms-order-detail.html'">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FULFILLMENT + INVENTORY + SCHOOLS -->
+    <div class="three-col">
+
+      <!-- Fulfillment Queue -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-title-icon">📋</span> Fulfillment Queue</div>
+          <div class="panel-actions">
+            <span style="font-size:12px;color:var(--gray-500);">23 pending</span>
+            <button class="panel-btn primary" onclick="showToast('Opening full queue...')">View All</button>
+          </div>
+        </div>
+        <div class="fulfill-list">
+          <div class="fulfill-item">
+            <div class="fulfill-priority priority-urgent"></div>
+            <div class="fulfill-info">
+              <div class="fulfill-name">Jennifer Torres</div>
+              <div class="fulfill-items">3× Polo, 2× Pants, 1× Sweater</div>
+              <div class="fulfill-school">🏫 St. Mary's Academy</div>
+            </div>
+            <div class="fulfill-tags">
+              <span class="fulfill-tag ft-emb">🧵 EMB</span>
+              <span class="fulfill-tag ft-rush">RUSH</span>
+            </div>
+            <button class="fulfill-btn" onclick="showToast('Order marked as picking...')">Pick</button>
+          </div>
+          <div class="fulfill-item">
+            <div class="fulfill-priority priority-urgent"></div>
+            <div class="fulfill-info">
+              <div class="fulfill-name">Michael Chen</div>
+              <div class="fulfill-items">12× Mixed items (bulk order)</div>
+              <div class="fulfill-school">🏫 Lincoln Elementary</div>
+            </div>
+            <div class="fulfill-tags">
+              <span class="fulfill-tag ft-bulk">BULK</span>
+            </div>
+            <button class="fulfill-btn" onclick="showToast('Order marked as picking...')">Pick</button>
+          </div>
+          <div class="fulfill-item">
+            <div class="fulfill-priority priority-normal"></div>
+            <div class="fulfill-info">
+              <div class="fulfill-name">Sarah Williams</div>
+              <div class="fulfill-items">4× items — 2× Polo, 2× Pants</div>
+              <div class="fulfill-school">🏫 Holy Cross School</div>
+            </div>
+            <div class="fulfill-tags"></div>
+            <button class="fulfill-btn" onclick="showToast('Order marked as picking...')">Pick</button>
+          </div>
+          <div class="fulfill-item">
+            <div class="fulfill-priority priority-normal"></div>
+            <div class="fulfill-info">
+              <div class="fulfill-name">Robert Diaz</div>
+              <div class="fulfill-items">2× Classic Polo, Navy, Sz 8</div>
+              <div class="fulfill-school">🏫 St. Francis Prep</div>
+            </div>
+            <div class="fulfill-tags"></div>
+            <button class="fulfill-btn" onclick="showToast('Order marked as picking...')">Pick</button>
+          </div>
+          <div class="fulfill-item">
+            <div class="fulfill-priority priority-low"></div>
+            <div class="fulfill-info">
+              <div class="fulfill-name">Lisa Park</div>
+              <div class="fulfill-items">1× Blouse, 1× Skirt, 1× Sweater</div>
+              <div class="fulfill-school">🏫 St. Mary's Academy</div>
+            </div>
+            <div class="fulfill-tags">
+              <span class="fulfill-tag ft-emb">🧵 EMB</span>
+            </div>
+            <button class="fulfill-btn done" onclick="showToast('✓ Marked as packed!')">Pack</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Alerts -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-title-icon">⚠️</span> Inventory Alerts</div>
+          <button class="panel-btn" onclick="window.location='galaxy-uniforms-sku-manager.html'">Manage →</button>
+        </div>
+        <div class="inv-list">
+          <div class="inv-item">
+            <div class="inv-img" style="background:linear-gradient(135deg,#D8E0EE,#C4CCDC);">👕</div>
+            <div style="flex:1">
+              <div class="inv-name">Classic Polo — Navy Sz 8</div>
+              <div class="inv-sku">SKU: CP-NVY-08-REG</div>
+            </div>
+            <div class="inv-bar-wrap"><div class="inv-bar critical" style="width:12%"></div></div>
+            <div class="inv-stock">
+              <div class="inv-qty critical">6</div>
+              <div class="inv-threshold">min 50</div>
+            </div>
+            <button class="inv-reorder" onclick="showToast('Reorder placed for Navy Polo Sz 8!')">Reorder</button>
+          </div>
+          <div class="inv-item">
+            <div class="inv-img" style="background:linear-gradient(135deg,#F0EAD6,#E0D4BC);">👖</div>
+            <div style="flex:1">
+              <div class="inv-name">Twill Pants — Khaki Sz 10S</div>
+              <div class="inv-sku">SKU: TP-KHK-10S-SLM</div>
+            </div>
+            <div class="inv-bar-wrap"><div class="inv-bar critical" style="width:8%"></div></div>
+            <div class="inv-stock">
+              <div class="inv-qty critical">4</div>
+              <div class="inv-threshold">min 40</div>
+            </div>
+            <button class="inv-reorder" onclick="showToast('Reorder placed for Khaki Pants 10S!')">Reorder</button>
+          </div>
+          <div class="inv-item">
+            <div class="inv-img" style="background:linear-gradient(135deg,#D8E0EE,#C4CCDC);">👕</div>
+            <div style="flex:1">
+              <div class="inv-name">Classic Polo — White Sz 6</div>
+              <div class="inv-sku">SKU: CP-WHT-06-REG</div>
+            </div>
+            <div class="inv-bar-wrap"><div class="inv-bar low" style="width:28%"></div></div>
+            <div class="inv-stock">
+              <div class="inv-qty low">18</div>
+              <div class="inv-threshold">min 50</div>
+            </div>
+            <button class="inv-reorder" onclick="showToast('Reorder placed for White Polo Sz 6!')">Reorder</button>
+          </div>
+          <div class="inv-item">
+            <div class="inv-img" style="background:linear-gradient(135deg,#D8E0EC,#C8D0DC);">🧥</div>
+            <div style="flex:1">
+              <div class="inv-name">V-Neck Sweater — Navy Sz M</div>
+              <div class="inv-sku">SKU: VNS-NVY-M-REG</div>
+            </div>
+            <div class="inv-bar-wrap"><div class="inv-bar low" style="width:38%"></div></div>
+            <div class="inv-stock">
+              <div class="inv-qty low">22</div>
+              <div class="inv-threshold">min 40</div>
+            </div>
+            <button class="inv-reorder" onclick="showToast('Reorder placed!')">Reorder</button>
+          </div>
+          <div class="inv-item">
+            <div class="inv-img" style="background:linear-gradient(135deg,#EDE8DC,#E0D8C8);">👖</div>
+            <div style="flex:1">
+              <div class="inv-name">Twill Pants — Navy Sz 12</div>
+              <div class="inv-sku">SKU: TP-NVY-12-REG</div>
+            </div>
+            <div class="inv-bar-wrap"><div class="inv-bar ok" style="width:78%"></div></div>
+            <div class="inv-stock">
+              <div class="inv-qty ok">94</div>
+              <div class="inv-threshold">min 40</div>
+            </div>
+            <button class="inv-reorder" style="opacity:0.4;cursor:default">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Schools -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-title-icon">🏫</span> Top Schools by Revenue</div>
+          <button class="panel-btn">This Month</button>
+        </div>
+        <div class="schools-list">
+          <div class="school-item">
+            <div class="school-rank top">1</div>
+            <div class="school-avatar">⭐</div>
+            <div style="flex:1"><div class="school-name">St. Mary's Academy</div><div class="school-location">Newark, NJ</div></div>
+            <div class="school-bar-wrap"><div class="school-bar" style="width:100%"></div></div>
+            <div><div class="school-revenue">$8,420</div><div class="school-orders">84 orders</div></div>
+          </div>
+          <div class="school-item">
+            <div class="school-rank top">2</div>
+            <div class="school-avatar">🎓</div>
+            <div style="flex:1"><div class="school-name">Lincoln Elementary</div><div class="school-location">Brooklyn, NY</div></div>
+            <div class="school-bar-wrap"><div class="school-bar" style="width:74%"></div></div>
+            <div><div class="school-revenue">$6,240</div><div class="school-orders">67 orders</div></div>
+          </div>
+          <div class="school-item">
+            <div class="school-rank">3</div>
+            <div class="school-avatar">✝️</div>
+            <div style="flex:1"><div class="school-name">Holy Cross School</div><div class="school-location">Newark, NJ</div></div>
+            <div class="school-bar-wrap"><div class="school-bar" style="width:58%"></div></div>
+            <div><div class="school-revenue">$4,890</div><div class="school-orders">51 orders</div></div>
+          </div>
+          <div class="school-item">
+            <div class="school-rank">4</div>
+            <div class="school-avatar">🏛️</div>
+            <div style="flex:1"><div class="school-name">Sacred Heart</div><div class="school-location">Jersey City, NJ</div></div>
+            <div class="school-bar-wrap"><div class="school-bar" style="width:44%"></div></div>
+            <div><div class="school-revenue">$3,720</div><div class="school-orders">38 orders</div></div>
+          </div>
+          <div class="school-item">
+            <div class="school-rank">5</div>
+            <div class="school-avatar">🎒</div>
+            <div style="flex:1"><div class="school-name">JFK Middle School</div><div class="school-location">Bronx, NY</div></div>
+            <div class="school-bar-wrap"><div class="school-bar" style="width:31%"></div></div>
+            <div><div class="school-revenue">$2,610</div><div class="school-orders">27 orders</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMBROIDERY QUEUE + ACTIVITY FEED -->
+    <div class="two-col">
+
+      <!-- Embroidery Queue -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-title-icon">🧵</span> Embroidery Queue</div>
+          <div class="panel-actions">
+            <span style="font-size:12px;color:var(--amber);font-weight:700;">8 pending</span>
+            <button class="panel-btn primary" onclick="showToast('Opening embroidery manager...')">Manage</button>
+          </div>
+        </div>
+        <div class="emb-queue">
+          <div class="emb-item">
+            <div class="emb-num">#GU-20249102</div>
+            <div class="emb-info">
+              <div class="emb-product">3× Classic Piqué Polo — Navy Sz 10</div>
+              <div class="emb-detail">Left chest · St. Mary's Academy crest</div>
+            </div>
+            <span class="emb-school-tag">St. Mary's</span>
+            <div class="emb-due overdue">
+              Due TODAY
+              <div class="emb-status">⏳ In queue</div>
+            </div>
+          </div>
+          <div class="emb-item">
+            <div class="emb-num">#GU-20249087</div>
+            <div class="emb-info">
+              <div class="emb-product">5× Oxford Polo — White Sz 12</div>
+              <div class="emb-detail">Left chest · Lincoln Elem. logo</div>
+            </div>
+            <span class="emb-school-tag">Lincoln</span>
+            <div class="emb-due">
+              Due Mar 7
+              <div class="emb-status">🔄 Stitching</div>
+            </div>
+          </div>
+          <div class="emb-item">
+            <div class="emb-num">#GU-20249065</div>
+            <div class="emb-info">
+              <div class="emb-product">2× V-Neck Sweater — Navy Sz M + L</div>
+              <div class="emb-detail">Left chest · Holy Cross crest</div>
+            </div>
+            <span class="emb-school-tag">Holy Cross</span>
+            <div class="emb-due">
+              Due Mar 8
+              <div class="emb-status">⏳ In queue</div>
+            </div>
+          </div>
+          <div class="emb-item">
+            <div class="emb-num">#GU-20249054</div>
+            <div class="emb-info">
+              <div class="emb-product">8× Classic Polo — Burgundy, Various Sz</div>
+              <div class="emb-detail">Left chest · Sacred Heart logo · BULK</div>
+            </div>
+            <span class="emb-school-tag">Sacred Heart</span>
+            <div class="emb-due">
+              Due Mar 10
+              <div class="emb-status">✅ QC Review</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-title-icon">⚡</span> Live Activity</div>
+          <button class="panel-btn">Pause</button>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-dot ad-order"></div>
+            <div class="activity-text"><strong>New order</strong> #GU-20249102 placed by Jennifer Torres — 7 items, $142.91</div>
+            <div class="activity-time">2m ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot ad-inventory"></div>
+            <div class="activity-text"><strong>Low stock alert:</strong> Classic Polo Navy Sz 8 — only 6 units remaining (min: 50)</div>
+            <div class="activity-time">8m ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot ad-school"></div>
+            <div class="activity-text"><strong>New school registered:</strong> Mt. Carmel Academy, Newark NJ — 320 students</div>
+            <div class="activity-time">22m ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot ad-order"></div>
+            <div class="activity-text"><strong>Order shipped:</strong> #GU-20249085 to David Kim — USPS tracking #9400111899</div>
+            <div class="activity-time">34m ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot ad-embroidery"></div>
+            <div class="activity-text"><strong>Embroidery complete:</strong> Order #GU-20249054, 8× Sacred Heart polos — ready to ship</div>
+            <div class="activity-time">1h ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot ad-order"></div>
+            <div class="activity-text"><strong>Bulk order</strong> placed by Lincoln Elementary — 12 items, $289.44</div>
+            <div class="activity-time">1h ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot ad-inventory"></div>
+            <div class="activity-text"><strong>Reorder confirmed:</strong> 200× Twill Pants Khaki from supplier — ETA Mar 12</div>
+            <div class="activity-time">2h ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot ad-school"></div>
+            <div class="activity-text"><strong>School proposal accepted:</strong> Brooklyn Prep — 480 students, start Aug 2026</div>
+            <div class="activity-time">3h ago</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span>✓</span>
+  <span id="toastMsg">Done!</span>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Revenue chart
+  const months = ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+  const thisYear = [28, 31, 29, 35, 38, 142, 86, 44, 52, 48, 71, 84];
+  const lastYear = [22, 25, 24, 28, 31, 118, 70, 38, 44, 41, 60, 72];
+  const maxVal = Math.max(...thisYear, ...lastYear);
+  const btsPeaks = [5, 6]; // index of BTS months (Aug, Sep)
+
+  const chartEl = document.getElementById('revenueChart');
+  months.forEach((m, i) => {
+    const group = document.createElement('div');
+    group.className = 'chart-bar-group';
+
+    const prevBar = document.createElement('div');
+    prevBar.className = 'chart-bar prev';
+    prevBar.style.height = ((lastYear[i] / maxVal) * 160) + 'px';
+    prevBar.setAttribute('data-val', `$${lastYear[i]}k`);
+
+    const currBar = document.createElement('div');
+    currBar.className = 'chart-bar ' + (btsPeaks.includes(i) ? 'bts' : 'current');
+    currBar.style.height = ((thisYear[i] / maxVal) * 160) + 'px';
+    currBar.setAttribute('data-val', `$${thisYear[i]}k`);
+
+    const label = document.createElement('div');
+    label.className = 'chart-label';
+    label.textContent = m;
+
+    group.appendChild(prevBar);
+    group.appendChild(currBar);
+    group.appendChild(label);
+    chartEl.appendChild(group);
+  });
+
+  // Sidebar active
+  function setActive(el) {
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Tab active
+  function setTab(el) {
+    el.closest('.tab-row').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Toast
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Live activity pulse (simulate new events)
+  let tickCount = 0;
+  const liveEvents = [
+    { type: 'ad-order', text: '<strong>New order</strong> #GU-20249111 — 3 items, $44.97' },
+    { type: 'ad-school', text: '<strong>School search:</strong> Parent searched "Sacred Heart Newark" — 3 results shown' },
+    { type: 'ad-inventory', text: '<strong>Stock update:</strong> Navy Polo Sz 10 — 43 units remaining' },
+    { type: 'ad-embroidery', text: '<strong>Embroidery queued:</strong> Order #GU-20249109 — 2× Polo, Holy Cross' },
+  ];
+
+  setInterval(() => {
+    

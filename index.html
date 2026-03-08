@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy Uniforms — Prototype Navigator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1F3C; --navy-mid: #1A3358; --navy-light: #2A4A7A;
+    --gold: #E8A020; --gold-light: #F5C050; --gold-pale: rgba(232,160,32,0.10);
+    --cream: #F8F7F3;
+    --gray-100: #F0F2F5; --gray-200: #E4E8ED; --gray-300: #CBD0D8;
+    --gray-400: #9CA3AF; --gray-500: #6B7280;
+    --green: #1A7A4A; --green-pale: rgba(26,122,74,0.09);
+    --red: #E03C31;
+    --shadow-sm: 0 1px 4px rgba(13,31,60,0.07);
+    --shadow-md: 0 6px 24px rgba(13,31,60,0.12);
+    --shadow-lg: 0 16px 48px rgba(13,31,60,0.18);
+    --shadow-xl: 0 28px 72px rgba(13,31,60,0.22);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: white; min-height: 100vh; overflow-x: hidden; }
+
+  /* ── STARFIELD BACKGROUND ── */
+  .stars-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(1.5px 1.5px at 8% 12%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 44%, rgba(232,160,32,0.5) 0%, transparent 100%),
+      radial-gradient(2px 2px at 35% 8%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 48% 65%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 61% 22%, rgba(232,160,32,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 72% 78%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 84% 15%, rgba(255,255,255,0.55) 0%, transparent 100%),
+      radial-gradient(1px 1px at 91% 54%, rgba(232,160,32,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 88%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 55% 92%, rgba(255,255,255,0.45) 0%, transparent 100%),
+      radial-gradient(1px 1px at 78% 40%, rgba(232,160,32,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 4% 60%, rgba(255,255,255,0.35) 0%, transparent 100%);
+  }
+
+  /* ── HERO ── */
+  .hero { position: relative; z-index: 1; text-align: center; padding: 72px 24px 48px; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(232,160,32,0.15); border: 1px solid rgba(232,160,32,0.35); color: var(--gold-light); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 14px; border-radius: 20px; margin-bottom: 22px; }
+  .hero-logo { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 18px; }
+  .hero-logo-icon { width: 56px; height: 56px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 8px rgba(232,160,32,0.12); }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 62px); font-weight: 900; color: white; line-height: 1.05; letter-spacing: -1px; }
+  .hero-title span { color: var(--gold-light); }
+  .hero-sub { font-size: 16px; color: rgba(255,255,255,0.55); margin-top: 12px; font-weight: 400; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+  .hero-stats { display: flex; align-items: center; justify-content: center; gap: 32px; margin-top: 32px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; color: var(--gold-light); }
+  .hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .hero-stat-div { width: 1px; height: 36px; background: rgba(255,255,255,0.12); }
+
+  /* ── SECTION ── */
+  .section { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; padding: 0 24px 64px; }
+  .section-label { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .section-label-text { font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+  .section-label-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow { display: flex; align-items: center; gap: 0; margin-bottom: 48px; overflow-x: auto; padding: 4px 0; }
+  .flow-node { flex-shrink: 0; }
+  .flow-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10); border-radius: 10px; padding: 10px 14px; text-align: center; cursor: pointer; text-decoration: none; color: white; transition: all .2s; display: block; min-width: 88px; }
+  .flow-card:hover { background: rgba(232,160,32,0.12); border-color: rgba(232,160,32,0.4); transform: translateY(-2px); }
+  .flow-card-icon { font-size: 18px; margin-bottom: 4px; }
+  .flow-card-name { font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .flow-arrow { color: rgba(255,255,255,0.2); font-size: 16px; padding: 0 6px; flex-shrink: 0; align-self: center; }
+
+  /* ── PAGE CARDS ── */
+  .cards-grid { display: grid; gap: 16px; }
+  .cards-grid.frontend { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .cards-grid.backend { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+  .page-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 16px; overflow: hidden; transition: all .25s; text-decoration: none; color: white; display: flex; flex-direction: column; position: relative; }
+  .page-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+  .page-card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+  .card-preview { height: 172px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .card-preview-inner { display: flex; flex-direction: column; gap: 6px; width: 88%; }
+  .preview-bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.08); }
+  .preview-bar.wide { width: 100%; }
+  .preview-bar.mid { width: 68%; }
+  .preview-bar.short { width: 40%; }
+  .preview-bar.gold { background: rgba(232,160,32,0.35); }
+  .preview-bar.navy-light { background: rgba(42,74,122,0.6); }
+  .preview-hero { width: 100%; height: 44px; border-radius: 7px; background: linear-gradient(135deg, rgba(13,31,60,0.8), rgba(26,51,88,0.8)); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 6px; }
+  .preview-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+  .preview-cell { height: 28px; border-radius: 5px; background: rgba(255,255,255,0.07); }
+  .preview-sidebar { display: flex; gap: 6px; }
+  .preview-side { width: 28%; background: rgba(13,31,60,0.6); border-radius: 5px; height: 54px; }
+  .preview-main { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .preview-row { height: 8px; border-radius: 3px; background: rgba(255,255,255,0.08); }
+  .preview-table { display: flex; flex-direction: column; gap: 3px; }
+  .preview-table-row { display: flex; gap: 3px; }
+  .preview-table-cell { flex: 1; height: 10px; border-radius: 2px; background: rgba(255,255,255,0.07); }
+  .preview-table-row:first-child .preview-table-cell { background: rgba(13,31,60,0.7); }
+
+  /* Unique tint per card */
+  .tint-home { background: linear-gradient(135deg, rgba(13,31,60,0.9) 0%, rgba(26,51,88,0.7) 100%); }
+  .tint-product { background: linear-gradient(135deg, rgba(26,51,88,0.8) 0%, rgba(42,74,122,0.5) 100%); }
+  .tint-category { background: linear-gradient(135deg, rgba(13,31,60,0.85) 0%, rgba(13,115,119,0.2) 100%); }
+  .tint-cart { background: linear-gradient(135deg, rgba(26,122,74,0.12) 0%, rgba(13,31,60,0.9) 100%); }
+  .tint-checkout { background: linear-gradient(135deg, rgba(26,122,74,0.2) 0%, rgba(13,31,60,0.85) 100%); }
+  .tint-account { background: linear-gradient(135deg, rgba(109,40,217,0.15) 0%, rgba(13,31,60,0.9) 100%); }
+  .tint-admin { background: linear-gradient(135deg, rgba(13,31,60,0.95) 0%, rgba(8,14,24,0.9) 100%); }
+  .tint-orders { background: linear-gradient(135deg, rgba(180,83,9,0.15) 0%, rgba(13,31,60,0.9) 100%); }
+  .tint-sku { background: linear-gradient(135deg, rgba(21,101,192,0.15) 0%, rgba(13,31,60,0.9) 100%); }
+  .tint-analytics { background: linear-gradient(135deg, rgba(13,31,60,0.9) 0%, rgba(109,40,217,0.12) 100%); }
+
+  .card-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+  .card-icon { font-size: 20px; }
+  .card-arrow { font-size: 16px; color: var(--gold-light); opacity: 0; transform: translateX(-4px); transition: all .2s; }
+  .card-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; color: white; margin-bottom: 6px; line-height: 1.2; }
+  .card-desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.6; flex: 1; }
+  .card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; }
+  .card-tag { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+  .tag-customer { background: rgba(21,101,192,0.2); color: #7EB3FF; }
+  .tag-admin { background: rgba(232,160,32,0.15); color: var(--gold-light); }
+  .tag-interactive { background: rgba(26,122,74,0.2); color: #6DD9A4; }
+  .tag-new { background: rgba(232,160,32,0.3); color: var(--gold-light); border: 1px solid rgba(232,160,32,0.4); }
+
+  /* ── USER FLOWS ── */
+  .flows-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 48px; }
+  .flow-card-big { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; padding: 20px 22px; }
+  .flow-card-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .flow-steps { display: flex; align-items: center; gap: 0; flex-wrap: wrap; gap: 4px; }
+  .flow-step-chip { font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; color: white; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); transition: all .15s; white-space: nowrap; }
+  .flow-step-chip:hover { background: rgba(232,160,32,0.2); border-color: rgba(232,160,32,0.4); color: var(--gold-light); }
+  .flow-step-arrow { font-size: 12px; color: rgba(255,255,255,0.2); padding: 0 2px; }
+
+  /* ── FOOTER ── */
+  .proto-footer { position: relative; z-index: 1; border-top: 1px solid rgba(255,255,255,0.07); padding: 28px 24px; text-align: center; }
+  .footer-text { font-size: 12px; color: rgba(255,255,255,0.25); }
+  .footer-text strong { color: rgba(255,255,255,0.5); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .page-card { animation: fadeUp .5s ease both; }
+  .page-card:nth-child(1) { animation-delay: .05s; }
+  .page-card:nth-child(2) { animation-delay: .10s; }
+  .page-card:nth-child(3) { animation-delay: .15s; }
+  .page-card:nth-child(4) { animation-delay: .20s; }
+  .page-card:nth-child(5) { animation-delay: .25s; }
+  .page-card:nth-child(6) { animation-delay: .30s; }
+</style>
+</head>
+<body>
+
+<div class="stars-bg"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">✦ Interactive Prototype</div>
+  <div class="hero-logo">
+    <div class="hero-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" width="28" height="28">
+        <circle cx="12" cy="12" r="3.5" fill="#0D1F3C"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#0D1F3C" stroke-width="1.5" fill="none"/>
+        <path d="M2 12 Q7 7 12 12 Q17 17 22 12" stroke="rgba(13,31,60,0.5)" stroke-width="1.2" fill="none"/>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-title">Galaxy <span>Uniforms</span></div>
+  <div class="hero-sub">A fully-designed school uniform e-commerce platform — 10 linked pages, customer-facing storefront + complete admin backend.</div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">Pages</div></div>
+    <div class="hero-stat-div"></div>
+    <div class="hero-stat"><div class="hero-stat-num">2</div><div class="hero-stat-label">Sides</div></div>
+    <div class="hero-stat-div"></div>
+    <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">Interactive</div></div>
+    <div class="hero-stat-div"></div>
+    <div class="hero-stat"><div class="hero-stat-num">2,041</div><div class="hero-stat-label">Partner Schools</div></div>
+  </div>
+</div>
+
+<!-- USER FLOWS -->
+<div class="section">
+  <div class="section-label">
+    <div class="section-label-text">User Flows</div>
+    <div class="section-label-line"></div>
+  </div>
+  <div class="flows-grid">
+    <div class="flow-card-big">
+      <div class="flow-card-title">🛍 Customer Purchase Flow</div>
+      <div class="flow-steps">
+        <a href="galaxy-uniforms-homepage.html" class="flow-step-chip">Homepage</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-category.html" class="flow-step-chip">Browse</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-product.html" class="flow-step-chip">Product</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-cart.html" class="flow-step-chip">Cart</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-checkout.html" class="flow-step-chip">Checkout ✓</a>
+      </div>
+    </div>
+    <div class="flow-card-big">
+      <div class="flow-card-title">⚙️ Admin Fulfillment Flow</div>
+      <div class="flow-steps">
+        <a href="galaxy-uniforms-admin.html" class="flow-step-chip">Dashboard</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-order-detail.html" class="flow-step-chip">Order Detail</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-order-detail.html" class="flow-step-chip">Pick & Pack</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-order-detail.html" class="flow-step-chip">Ship ✓</a>
+      </div>
+    </div>
+    <div class="flow-card-big">
+      <div class="flow-card-title">👤 Returning Customer</div>
+      <div class="flow-steps">
+        <a href="galaxy-uniforms-account.html" class="flow-step-chip">Account</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-account.html" class="flow-step-chip">Quick Reorder</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-cart.html" class="flow-step-chip">Cart</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-checkout.html" class="flow-step-chip">Checkout ✓</a>
+      </div>
+    </div>
+    <div class="flow-card-big">
+      <div class="flow-card-title">📊 Catalog Management</div>
+      <div class="flow-steps">
+        <a href="galaxy-uniforms-admin.html" class="flow-step-chip">Dashboard</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-sku-manager.html" class="flow-step-chip">SKU Manager</a>
+        <span class="flow-step-arrow">→</span>
+        <a href="galaxy-uniforms-analytics.html" class="flow-step-chip">Analytics</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="section-label">
+    <div class="section-label-text">Customer Storefront — 6 pages</div>
+    <div class="section-label-line"></div>
+  </div>
+  <div class="cards-grid frontend" style="margin-bottom:48px;">
+
+    <a href="galaxy-uniforms-homepage.html" class="page-card">
+      <div class="card-preview tint-home">
+        <div class="card-preview-inner">
+          <div class="preview-hero">🏠</div>
+          <div class="preview-bar wide gold"></div>
+          <div class="preview-bar mid"></div>
+          <div class="preview-grid">
+            <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">🏠</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Homepage</div>
+        <div class="card-desc">Hero with school finder, category grid, bundle builder, trust bar, and featured products.</div>
+        <div class="card-tags"><span class="card-tag tag-customer">Storefront</span><span class="card-tag tag-interactive">Interactive</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-category.html" class="page-card">
+      <div class="card-preview tint-category">
+        <div class="card-preview-inner">
+          <div class="preview-sidebar">
+            <div class="preview-side"></div>
+            <div class="preview-main">
+              <div class="preview-row" style="background:rgba(232,160,32,0.3);"></div>
+              <div class="preview-row"></div>
+              <div class="preview-grid" style="margin-top:4px;">
+                <div class="preview-cell"></div><div class="preview-cell"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">🗂</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Category Page</div>
+        <div class="card-desc">Boys Polos with filters sidebar, school-approved banner, product grid, and sort/view controls.</div>
+        <div class="card-tags"><span class="card-tag tag-customer">Storefront</span><span class="card-tag tag-interactive">Filters</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-product.html" class="page-card">
+      <div class="card-preview tint-product">
+        <div class="card-preview-inner">
+          <div style="display:flex;gap:6px;margin-bottom:6px;">
+            <div style="width:44px;height:44px;border-radius:6px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:20px;">👕</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:4px;justify-content:center;">
+              <div class="preview-bar wide" style="background:rgba(232,160,32,0.35);height:6px;"></div>
+              <div class="preview-bar mid"></div>
+            </div>
+          </div>
+          <div class="preview-bar wide"></div>
+          <div class="preview-bar short" style="background:rgba(26,122,74,0.4);margin-top:3px;"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">👕</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Product Page</div>
+        <div class="card-desc">Classic Piqué Polo — gallery, size/color/fit selector, embroidery options, multi-child ordering, volume pricing.</div>
+        <div class="card-tags"><span class="card-tag tag-customer">Storefront</span><span class="card-tag tag-interactive">Add to Cart</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-cart.html" class="page-card">
+      <div class="card-preview tint-cart">
+        <div class="card-preview-inner">
+          <div class="preview-table">
+            <div class="preview-table-row"><div class="preview-table-cell" style="background:rgba(13,31,60,0.7);"></div><div class="preview-table-cell" style="background:rgba(13,31,60,0.7);"></div><div class="preview-table-cell" style="background:rgba(13,31,60,0.7);"></div></div>
+            <div class="preview-table-row"><div class="preview-table-cell"></div><div class="preview-table-cell"></div><div class="preview-table-cell"></div></div>
+            <div class="preview-table-row"><div class="preview-table-cell"></div><div class="preview-table-cell"></div><div class="preview-table-cell"></div></div>
+            <div class="preview-table-row"><div class="preview-table-cell"></div><div class="preview-table-cell"></div><div class="preview-table-cell"></div></div>
+          </div>
+          <div class="preview-bar wide" style="background:rgba(26,122,74,0.5);margin-top:8px;height:14px;border-radius:7px;"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">🛒</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Cart</div>
+        <div class="card-desc">Items grouped by child, quantity controls, promo codes, order summary, express checkout options.</div>
+        <div class="card-tags"><span class="card-tag tag-customer">Storefront</span><span class="card-tag tag-interactive">Live Totals</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-checkout.html" class="page-card">
+      <div class="card-preview tint-checkout">
+        <div class="card-preview-inner">
+          <div style="display:flex;justify-content:center;gap:8px;margin-bottom:8px;">
+            <div style="width:18px;height:18px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;">✓</div>
+            <div style="width:40px;height:2px;background:rgba(255,255,255,0.15);align-self:center;"></div>
+            <div style="width:18px;height:18px;border-radius:50%;background:rgba(232,160,32,0.8);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--navy);">2</div>
+            <div style="width:40px;height:2px;background:rgba(255,255,255,0.1);align-self:center;"></div>
+            <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:9px;">3</div>
+          </div>
+          <div class="preview-bar wide"></div>
+          <div class="preview-bar mid"></div>
+          <div class="preview-bar wide" style="background:rgba(26,122,74,0.4);height:14px;border-radius:7px;margin-top:6px;"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">💳</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Checkout Flow</div>
+        <div class="card-desc">4-step flow: Shipping → Payment → Review → Confirmation. Live totals, rewards, promo codes.</div>
+        <div class="card-tags"><span class="card-tag tag-customer">Storefront</span><span class="card-tag tag-new">★ New</span><span class="card-tag tag-interactive">Multi-step</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-account.html" class="page-card">
+      <div class="card-preview tint-account">
+        <div class="card-preview-inner">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--navy);">JT</div>
+            <div style="flex:1;"><div class="preview-bar wide" style="height:6px;margin-bottom:3px;"></div><div class="preview-bar short" style="height:5px;"></div></div>
+          </div>
+          <div class="preview-grid">
+            <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">👤</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Account Dashboard</div>
+        <div class="card-desc">Child profiles, order history, saved sizes, Galaxy Rewards, subscriptions, quick reorder.</div>
+        <div class="card-tags"><span class="card-tag tag-customer">Storefront</span><span class="card-tag tag-interactive">Rewards</span></div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- BACKEND -->
+  <div class="section-label">
+    <div class="section-label-text">Admin Backend — 4 panels</div>
+    <div class="section-label-line"></div>
+  </div>
+  <div class="cards-grid backend">
+
+    <a href="galaxy-uniforms-admin.html" class="page-card">
+      <div class="card-preview tint-admin">
+        <div class="card-preview-inner">
+          <div class="preview-sidebar">
+            <div class="preview-side" style="width:22%;background:rgba(8,14,24,0.8);"></div>
+            <div class="preview-main">
+              <div class="preview-grid" style="grid-template-columns:1fr 1fr;margin-bottom:5px;">
+                <div class="preview-cell" style="background:rgba(232,160,32,0.2);"></div><div class="preview-cell"></div>
+              </div>
+              <div class="preview-bar wide" style="height:28px;border-radius:4px;background:rgba(13,31,60,0.5);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">📊</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Admin Dashboard</div>
+        <div class="card-desc">KPIs, revenue chart, orders, fulfillment queue, inventory alerts, live activity feed.</div>
+        <div class="card-tags"><span class="card-tag tag-admin">Admin</span><span class="card-tag tag-interactive">Live Feed</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-order-detail.html" class="page-card">
+      <div class="card-preview tint-orders">
+        <div class="card-preview-inner">
+          <div style="display:flex;justify-content:space-between;gap:4px;margin-bottom:6px;">
+            <div style="flex:1;height:8px;border-radius:4px;background:var(--green);"></div>
+            <div style="flex:1;height:8px;border-radius:4px;background:var(--green);"></div>
+            <div style="flex:1;height:8px;border-radius:4px;background:rgba(232,160,32,0.8);"></div>
+            <div style="flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,0.1);"></div>
+            <div style="flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,0.1);"></div>
+          </div>
+          <div class="preview-table">
+            <div class="preview-table-row"><div class="preview-table-cell"></div><div class="preview-table-cell"></div><div class="preview-table-cell" style="background:rgba(232,160,32,0.25);"></div></div>
+            <div class="preview-table-row"><div class="preview-table-cell"></div><div class="preview-table-cell"></div><div class="preview-table-cell"></div></div>
+            <div class="preview-table-row"><div class="preview-table-cell"></div><div class="preview-table-cell"></div><div class="preview-table-cell" style="background:rgba(224,60,49,0.2);"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">📦</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Order & Fulfillment</div>
+        <div class="card-desc">Pipeline tracker, pick list, embroidery queue, stock issue resolver, shipping label, timeline.</div>
+        <div class="card-tags"><span class="card-tag tag-admin">Admin</span><span class="card-tag tag-interactive">Advance Stage</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-sku-manager.html" class="page-card">
+      <div class="card-preview tint-sku">
+        <div class="card-preview-inner">
+          <div class="preview-sidebar" style="gap:5px;">
+            <div class="preview-main" style="width:40%;">
+              <div class="preview-bar wide" style="height:7px;margin-bottom:4px;"></div>
+              <div class="preview-bar wide" style="height:7px;margin-bottom:4px;"></div>
+              <div class="preview-bar wide" style="height:7px;background:rgba(232,160,32,0.3);"></div>
+            </div>
+            <div class="preview-main">
+              <div class="preview-bar wide" style="height:6px;"></div>
+              <div style="display:flex;gap:3px;margin-top:4px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:rgba(13,31,60,0.7);"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.15);"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:rgba(192,57,43,0.6);"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:rgba(46,125,50,0.6);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">👕</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Product & SKU Manager</div>
+        <div class="card-desc">Split-pane editor: product details, SKU inventory table, volume pricing, school assignments, embroidery codes.</div>
+        <div class="card-tags"><span class="card-tag tag-admin">Admin</span><span class="card-tag tag-interactive">Inline Edit</span></div>
+      </div>
+    </a>
+
+    <a href="galaxy-uniforms-analytics.html" class="page-card">
+      <div class="card-preview tint-analytics">
+        <div class="card-preview-inner">
+          <div style="display:flex;align-items:flex-end;gap:2px;height:36px;margin-bottom:6px;">
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:40%;"></div>
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:55%;"></div>
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:45%;"></div>
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:60%;"></div>
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:50%;"></div>
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:70%;"></div>
+            <div style="flex:1;background:rgba(232,160,32,0.8);border-radius:2px 2px 0 0;height:100%;"></div>
+            <div style="flex:1;background:rgba(232,160,32,0.6);border-radius:2px 2px 0 0;height:80%;"></div>
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:60%;"></div>
+            <div style="flex:1;background:rgba(13,31,60,0.6);border-radius:2px 2px 0 0;height:55%;"></div>
+          </div>
+          <div class="preview-bar wide"></div>
+          <div class="preview-bar mid" style="margin-top:3px;background:rgba(109,40,217,0.3);"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-top"><span class="card-icon">📈</span><span class="card-arrow">→</span></div>
+        <div class="card-name">Reports & Analytics</div>
+        <div class="card-desc">Revenue charts, conversion funnel, heatmap, cohort analysis, AI insights, BTS forecast, scheduled reports.</div>
+        <div class="card-tags"><span class="card-tag tag-admin">Admin</span><span class="card-tag tag-interactive">Charts</span></div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<div class="proto-footer">
+  <div class="footer-text">
+    <strong>Galaxy Uniforms</strong> — School Uniform E-Commerce Platform &nbsp;·&nbsp; 10 pages &nbsp;·&nbsp; Built with HTML, CSS & JavaScript
+  </div>
+</div>
+
+</body>
+</html>

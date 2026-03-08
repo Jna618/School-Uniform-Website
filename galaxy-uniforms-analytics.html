@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports & Analytics – Galaxy Uniforms Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1F3C; --navy-mid: #1A3358; --navy-light: #2A4A7A; --navy-pale: #EEF2F8;
+    --gold: #E8A020; --gold-light: #F5C050; --gold-pale: rgba(232,160,32,0.09);
+    --white: #FFFFFF; --sidebar-bg: #0A1828; --sidebar-border: rgba(255,255,255,0.07);
+    --gray-50: #F8F9FA; --gray-100: #F0F2F5; --gray-200: #E4E8ED;
+    --gray-300: #CBD0D8; --gray-400: #9CA3AF; --gray-500: #6B7280; --gray-700: #374151;
+    --red: #E03C31; --red-pale: rgba(224,60,49,0.09);
+    --green: #1A7A4A; --green-pale: rgba(26,122,74,0.09);
+    --blue: #1565C0; --blue-pale: rgba(21,101,192,0.09);
+    --amber: #B45309; --amber-pale: rgba(180,83,9,0.09);
+    --purple: #6D28D9; --purple-pale: rgba(109,40,217,0.08);
+    --teal: #0D7377; --teal-pale: rgba(13,115,119,0.09);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg: 0 10px 36px rgba(0,0,0,0.14); --radius: 12px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--gray-100); color: var(--navy); display: flex; height: 100vh; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; flex-shrink: 0; background: var(--sidebar-bg); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; border-right: 1px solid var(--sidebar-border); }
+  .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .sidebar-logo-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 800; color: white; }
+  .sidebar-logo-sub { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 1.5px; text-transform: uppercase; }
+  .sidebar-section { padding: 16px 12px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.28); }
+  .sidebar-nav { padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,0.55); cursor: pointer; transition: all .18s; text-decoration: none; position: relative; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+  .sidebar-item.active { background: rgba(232,160,32,0.15); color: var(--gold-light); font-weight: 700; }
+  .sidebar-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--gold); border-radius: 0 3px 3px 0; }
+  .sidebar-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+  .sidebar-badge { margin-left: auto; background: var(--red); color: white; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; }
+  .sidebar-badge.amber { background: var(--amber); }
+  .sidebar-divider { border: none; border-top: 1px solid var(--sidebar-border); margin: 8px 12px; }
+  .sidebar-user { padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--sidebar-border); margin-top: auto; }
+  .sidebar-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--navy); font-family: 'Playfair Display', serif; }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 24px; height: 62px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm); gap: 16px; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .tb-btn { height: 34px; padding: 0 13px; border-radius: 7px; border: 1.5px solid var(--gray-200); background: var(--white); font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--navy); display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap; }
+  .tb-btn:hover { border-color: var(--navy); background: var(--gray-50); }
+  .tb-btn.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .date-range { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--gray-200); border-radius: 8px; overflow: hidden; background: white; }
+  .date-range-btn { padding: 7px 13px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--gray-700); border: none; background: none; font-family: 'DM Sans', sans-serif; transition: background .15s; white-space: nowrap; border-right: 1px solid var(--gray-200); }
+  .date-range-btn:last-child { border-right: none; }
+  .date-range-btn.active { background: var(--navy); color: white; }
+  .date-range-btn:hover:not(.active) { background: var(--gray-50); }
+
+  /* PAGE TABS */
+  .page-tabs { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 24px; display: flex; gap: 0; flex-shrink: 0; overflow-x: auto; }
+  .page-tab { padding: 14px 18px; font-size: 13px; font-weight: 600; color: var(--gray-500); cursor: pointer; border-bottom: 2.5px solid transparent; white-space: nowrap; transition: all .15s; }
+  .page-tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+  .page-tab:hover:not(.active) { color: var(--navy); }
+
+  /* CONTENT */
+  .content { flex: 1; overflow-y: auto; padding: 22px 24px 48px; }
+
+  /* KPI STRIP */
+  .kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+  .kpi { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); padding: 16px 18px; box-shadow: var(--shadow-sm); transition: transform .2s; cursor: default; }
+  .kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .kpi-icon-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .kpi-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .ki-rev { background: var(--gold-pale); }
+  .ki-ord { background: var(--blue-pale); }
+  .ki-aov { background: var(--purple-pale); }
+  .ki-emb { background: var(--gold-pale); }
+  .ki-ret { background: var(--teal-pale); }
+  .kpi-trend { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+  .trend-up { background: var(--green-pale); color: var(--green); }
+  .trend-down { background: var(--red-pale); color: var(--red); }
+  .kpi-val { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+  .kpi-label { font-size: 12px; color: var(--gray-500); }
+  .kpi-sub { font-size: 10px; color: var(--gray-400); margin-top: 3px; }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px; }
+
+  /* PANEL */
+  .panel { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .panel-header { padding: 14px 18px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .panel-title { font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 7px; }
+  .panel-actions { display: flex; gap: 6px; align-items: center; }
+  .panel-btn { font-size: 11px; font-weight: 700; color: var(--navy); background: var(--gray-100); border: none; padding: 4px 9px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .15s; }
+  .panel-btn:hover { background: var(--gray-200); }
+  .panel-btn.active { background: var(--navy); color: white; }
+  .panel-body { padding: 16px 18px; }
+  .panel-body.no-pad { padding: 0; }
+
+  /* ── CHARTS ── */
+  /* Revenue area chart */
+  .chart-container { position: relative; width: 100%; }
+  .area-chart { width: 100%; height: 180px; display: flex; align-items: flex-end; gap: 3px; padding-bottom: 22px; position: relative; }
+  .area-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0; cursor: pointer; position: relative; }
+  .area-bar { width: 100%; border-radius: 4px 4px 0 0; transition: opacity .15s; position: relative; }
+  .area-bar.rev { background: linear-gradient(180deg, var(--navy) 0%, rgba(13,31,60,0.7)); }
+  .area-bar.rev-prev { background: var(--gray-200); }
+  .area-bar.bts { background: linear-gradient(180deg, var(--gold) 0%, rgba(232,160,32,0.7)); }
+  .area-bar:hover { opacity: 0.75; }
+  .area-bar::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--navy); color: white; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 5px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s; margin-bottom: 4px; }
+  .area-bar:hover::after { opacity: 1; }
+  .area-label { font-size: 9px; color: var(--gray-400); font-weight: 600; text-align: center; margin-top: 3px; }
+
+  /* sparkline */
+  .sparkline { display: flex; align-items: flex-end; gap: 2px; height: 32px; }
+  .spark-bar { flex: 1; border-radius: 2px 2px 0 0; min-width: 3px; }
+  .spark-up { background: var(--green); }
+  .spark-down { background: var(--gray-200); }
+
+  /* donut */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+  .donut-leg-item { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .donut-leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .donut-leg-label { font-size: 12px; color: var(--gray-700); flex: 1; }
+  .donut-leg-val { font-size: 12px; font-weight: 700; color: var(--navy); }
+  .donut-leg-pct { font-size: 10px; color: var(--gray-400); margin-left: 3px; }
+
+  /* heatmap */
+  .heatmap-grid { display: grid; grid-template-columns: 40px repeat(52, 1fr); gap: 2px; }
+  .hm-label { font-size: 9px; color: var(--gray-400); display: flex; align-items: center; }
+  .hm-cell { width: 100%; aspect-ratio: 1; border-radius: 2px; cursor: pointer; transition: transform .15s; }
+  .hm-cell:hover { transform: scale(1.3); }
+  .hm-0 { background: var(--gray-100); }
+  .hm-1 { background: rgba(13,31,60,0.15); }
+  .hm-2 { background: rgba(13,31,60,0.35); }
+  .hm-3 { background: rgba(13,31,60,0.6); }
+  .hm-4 { background: var(--navy); }
+  .hm-peak { background: var(--gold); }
+
+  /* bar horizontal */
+  .hbar-list { display: flex; flex-direction: column; gap: 10px; }
+  .hbar-row { display: flex; align-items: center; gap: 10px; }
+  .hbar-label { font-size: 12px; color: var(--navy); font-weight: 600; width: 130px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hbar-track { flex: 1; height: 8px; background: var(--gray-100); border-radius: 4px; overflow: hidden; cursor: pointer; }
+  .hbar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+  .hbar-val { font-size: 12px; font-weight: 700; color: var(--navy); width: 52px; text-align: right; flex-shrink: 0; }
+
+  /* funnel */
+  .funnel { display: flex; flex-direction: column; gap: 6px; }
+  .funnel-step { display: flex; align-items: center; gap: 12px; }
+  .funnel-bar-wrap { flex: 1; height: 32px; background: var(--gray-100); border-radius: 6px; overflow: hidden; position: relative; }
+  .funnel-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 12px; transition: width .8s ease; }
+  .funnel-bar-label { font-size: 11px; font-weight: 700; color: white; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); white-space: nowrap; }
+  .funnel-bar-val { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: white; }
+  .funnel-pct { font-size: 11px; color: var(--gray-500); width: 38px; text-align: right; flex-shrink: 0; }
+  .funnel-label { font-size: 12px; color: var(--navy); font-weight: 600; width: 130px; flex-shrink: 0; }
+
+  /* cohort table */
+  .cohort-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .cohort-table th { background: var(--gray-50); padding: 8px 10px; text-align: center; font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--gray-200); }
+  .cohort-table th:first-child { text-align: left; }
+  .cohort-table td { padding: 7px 10px; border-bottom: 1px solid var(--gray-100); text-align: center; font-weight: 600; }
+  .cohort-table td:first-child { text-align: left; color: var(--navy); font-size: 12px; }
+  .cohort-table tr:last-child td { border-bottom: none; }
+  .cohort-cell { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .cc-high { background: var(--navy); color: white; }
+  .cc-mid { background: rgba(13,31,60,0.35); color: white; }
+  .cc-low { background: rgba(13,31,60,0.12); color: var(--navy); }
+  .cc-min { background: var(--gray-100); color: var(--gray-400); }
+
+  /* top products table */
+  .prod-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .prod-table th { background: var(--gray-50); padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--gray-200); }
+  .prod-table td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  .prod-table tr:last-child td { border-bottom: none; }
+  .prod-table tr:hover td { background: var(--gray-50); }
+  .prod-rank { font-size: 13px; font-weight: 800; color: var(--gray-300); }
+  .prod-rank.gold { color: var(--gold); }
+  .prod-rank.silver { color: var(--gray-400); }
+  .prod-rank.bronze { color: #CD7F32; }
+  .prod-thumb-sm { width: 34px; height: 34px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 1px solid var(--gray-200); }
+  .prod-name-cell { font-weight: 600; color: var(--navy); }
+  .prod-cat { font-size: 10px; color: var(--gray-400); margin-top: 1px; }
+  .prod-rev { font-weight: 800; color: var(--navy); }
+  .prod-units { color: var(--gray-600); }
+  .prod-trend { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; }
+
+  /* geo */
+  .geo-list { display: flex; flex-direction: column; gap: 6px; }
+  .geo-row { display: flex; align-items: center; gap: 10px; }
+  .geo-state { font-size: 12px; font-weight: 700; color: var(--navy); width: 24px; flex-shrink: 0; }
+  .geo-name { font-size: 12px; color: var(--navy); flex: 1; font-weight: 500; }
+  .geo-bar-wrap { width: 80px; height: 6px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+  .geo-bar { height: 100%; border-radius: 3px; background: var(--navy); }
+  .geo-val { font-size: 12px; font-weight: 700; color: var(--navy); width: 44px; text-align: right; flex-shrink: 0; }
+
+  /* insight cards */
+  .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .insight-card { border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: transform .15s; }
+  .insight-card:hover { transform: translateY(-2px); }
+  .ic-gold { background: var(--gold-pale); border: 1.5px solid rgba(232,160,32,0.3); }
+  .ic-blue { background: var(--blue-pale); border: 1.5px solid rgba(21,101,192,0.2); }
+  .ic-green { background: var(--green-pale); border: 1.5px solid rgba(26,122,74,0.2); }
+  .ic-red { background: var(--red-pale); border: 1.5px solid rgba(224,60,49,0.2); }
+  .insight-icon { font-size: 18px; margin-bottom: 6px; }
+  .insight-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+  .insight-text { font-size: 11px; color: var(--gray-600); line-height: 1.5; }
+
+  /* mini table */
+  .mini-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .mini-table th { padding: 7px 10px; text-align: left; font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); }
+  .mini-table td { padding: 9px 10px; border-bottom: 1px solid var(--gray-100); }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table tr:hover td { background: var(--gray-50); }
+
+  /* bts countdown */
+  .bts-card { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%); border-radius: var(--radius); padding: 20px 22px; position: relative; overflow: hidden; }
+  .bts-stars { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 30% 70%, rgba(232,160,32,0.3) 0%, transparent 100%), radial-gradient(2px 2px at 60% 15%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.35) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 90% 35%, rgba(232,160,32,0.25) 0%, transparent 100%); }
+  .bts-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-light); margin-bottom: 8px; position: relative; z-index: 1; }
+  .bts-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; color: white; margin-bottom: 14px; position: relative; z-index: 1; }
+  .bts-counters { display: flex; gap: 12px; margin-bottom: 14px; position: relative; z-index: 1; }
+  .bts-count { text-align: center; }
+  .bts-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; color: var(--gold-light); line-height: 1; }
+  .bts-unit { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .bts-sep { font-size: 20px; color: rgba(255,255,255,0.2); align-self: center; padding-bottom: 12px; }
+  .bts-insight { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.6; position: relative; z-index: 1; }
+  .bts-insight strong { color: var(--gold-light); }
+
+  /* toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 999; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; transform: translateY(60px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .kpi, .panel { animation: fadeUp .4s ease both; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon"><svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;"><circle cx="12" cy="12" r="3" fill="#0D1F3C"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#0D1F3C" stroke-width="1.5" fill="none"/></svg></div>
+    <div><div class="sidebar-logo-name">Galaxy</div><div class="sidebar-logo-sub">Admin Panel</div></div>
+  </div>
+  <div class="sidebar-section">Overview</div>
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-admin.html" class="sidebar-item"><span class="sidebar-icon">📊</span> Dashboard</a>
+    <a href="galaxy-uniforms-order-detail.html" class="sidebar-item"><span class="sidebar-icon">📦</span> Orders <span class="sidebar-badge">14</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🧵</span> Embroidery Queue <span class="sidebar-badge">8</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📋</span> Fulfillment <span class="sidebar-badge">23</span></a>
+  </div>
+  <div class="sidebar-section">Catalog</div>
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-sku-manager.html" class="sidebar-item"><span class="sidebar-icon">👕</span> Products & SKUs</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📦</span> Inventory <span class="sidebar-badge amber">3</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🏷️</span> Pricing & Discounts</a>
+  </div>
+  <div class="sidebar-section">Schools & B2B</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🏫</span> Partner Schools</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🛍️</span> School Storefronts</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📝</span> Proposals & Quotes</a>
+  </div>
+  <div class="sidebar-section">Customers</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">👤</span> Customer Accounts</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">⭐</span> Galaxy Rewards</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">💬</span> Customer Service <span class="sidebar-badge">5</span></a>
+  </div>
+  <hr class="sidebar-divider">
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item active"><span class="sidebar-icon">📈</span> Reports & Analytics</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">⚙️</span> Settings</a>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">JG</div>
+    <div><div class="sidebar-user-name">James G.</div><div class="sidebar-user-role">Owner / Admin</div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">📈 Reports & Analytics</div>
+    <div class="topbar-right">
+      <div class="date-range">
+        <button class="date-range-btn" onclick="setRange(this)">7D</button>
+        <button class="date-range-btn" onclick="setRange(this)">30D</button>
+        <button class="date-range-btn active" onclick="setRange(this)">YTD</button>
+        <button class="date-range-btn" onclick="setRange(this)">12M</button>
+        <button class="date-range-btn" onclick="setRange(this)">Custom</button>
+      </div>
+      <button class="tb-btn" onclick="showToast('Scheduling email report...')">📧 Schedule Report</button>
+      <button class="tb-btn primary" onclick="showToast('Exporting PDF report...')">⬇ Export PDF</button>
+    </div>
+  </div>
+
+  <!-- PAGE TABS -->
+  <div class="page-tabs">
+    <div class="page-tab active" onclick="setTab(this)">📊 Overview</div>
+    <div class="page-tab" onclick="setTab(this)">🛒 Sales</div>
+    <div class="page-tab" onclick="setTab(this)">👕 Products</div>
+    <div class="page-tab" onclick="setTab(this)">🏫 Schools & B2B</div>
+    <div class="page-tab" onclick="setTab(this)">👤 Customers</div>
+    <div class="page-tab" onclick="setTab(this)">🧵 Embroidery</div>
+    <div class="page-tab" onclick="setTab(this)">📦 Inventory</div>
+    <div class="page-tab" onclick="setTab(this)">🚀 BTS Forecast</div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI STRIP -->
+    <div class="kpi-strip">
+      <div class="kpi">
+        <div class="kpi-icon-row"><div class="kpi-icon ki-rev">💰</div><span class="kpi-trend trend-up">↑ 22%</span></div>
+        <div class="kpi-val">$612k</div>
+        <div class="kpi-label">Total Revenue YTD</div>
+        <div class="kpi-sub">vs $502k last year</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon-row"><div class="kpi-icon ki-ord">📦</div><span class="kpi-trend trend-up">↑ 18%</span></div>
+        <div class="kpi-val">9,341</div>
+        <div class="kpi-label">Orders YTD</div>
+        <div class="kpi-sub">vs 7,916 last year</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon-row"><div class="kpi-icon ki-aov">🎯</div><span class="kpi-trend trend-up">↑ 4%</span></div>
+        <div class="kpi-val">$65.54</div>
+        <div class="kpi-label">Avg Order Value</div>
+        <div class="kpi-sub">vs $63.16 last year</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon-row"><div class="kpi-icon ki-emb">🧵</div><span class="kpi-trend trend-up">↑ 31%</span></div>
+        <div class="kpi-val">$98k</div>
+        <div class="kpi-label">Embroidery Revenue</div>
+        <div class="kpi-sub">16% of total revenue</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon-row"><div class="kpi-icon ki-ret">🔄</div><span class="kpi-trend trend-up">↑ 6pts</span></div>
+        <div class="kpi-val">34%</div>
+        <div class="kpi-label">Repeat Customer Rate</div>
+        <div class="kpi-sub">vs 28% last year</div>
+      </div>
+    </div>
+
+    <!-- REVENUE CHART + DONUT -->
+    <div class="grid-2-1" style="margin-bottom:16px;">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">💰 Monthly Revenue</div>
+          <div class="panel-actions">
+            <button class="panel-btn active" onclick="toggleChartMode(this,'rev')">Revenue</button>
+            <button class="panel-btn" onclick="toggleChartMode(this,'orders')">Orders</button>
+            <button class="panel-btn" onclick="toggleChartMode(this,'profit')">Profit</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:14px;">
+            <span style="font-family:'Playfair Display',serif;font-size:32px;font-weight:800;color:var(--navy);">$612,480</span>
+            <span style="font-size:13px;font-weight:700;background:var(--green-pale);color:var(--green);padding:3px 8px;border-radius:6px;">↑ 22% vs 2024</span>
+          </div>
+          <div class="area-chart" id="revenueChart"></div>
+          <div style="display:flex;gap:16px;margin-top:6px;">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-500);"><div style="width:10px;height:10px;border-radius:3px;background:var(--navy);"></div>2025</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-500);"><div style="width:10px;height:10px;border-radius:3px;background:var(--gray-200);"></div>2024</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-500);"><div style="width:10px;height:10px;border-radius:3px;background:var(--gold);"></div>BTS Peak</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🎯 Revenue Mix</div>
+          <button class="panel-btn" onclick="showToast('Viewing full breakdown...')">Detail →</button>
+        </div>
+        <div class="panel-body">
+          <div class="donut-wrap">
+            <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
+              <!-- Donut segments: Boys 38%, Girls 32%, Embroidery 16%, B2B 9%, Other 5% -->
+              <circle cx="55" cy="55" r="38" fill="none" stroke="#E4E8ED" stroke-width="18"/>
+              <circle cx="55" cy="55" r="38" fill="none" stroke="#0D1F3C" stroke-width="18" stroke-dasharray="90.7 148.7" stroke-dashoffset="0" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="38" fill="none" stroke="#1565C0" stroke-width="18" stroke-dasharray="76.3 163.1" stroke-dashoffset="-90.7" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="38" fill="none" stroke="#E8A020" stroke-width="18" stroke-dasharray="38.2 201.2" stroke-dashoffset="-167" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="38" fill="none" stroke="#1A7A4A" stroke-width="18" stroke-dasharray="21.5 217.9" stroke-dashoffset="-205.2" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="38" fill="none" stroke="#E4E8ED" stroke-width="18" stroke-dasharray="11.9 227.5" stroke-dashoffset="-226.7" transform="rotate(-90 55 55)"/>
+              <text x="55" y="51" text-anchor="middle" font-size="11" font-weight="800" fill="#0D1F3C" font-family="DM Sans">$612k</text>
+              <text x="55" y="63" text-anchor="middle" font-size="9" fill="#6B7280" font-family="DM Sans">Total</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="donut-leg-item" onclick="showToast('Boys: $232k')"><div class="donut-leg-dot" style="background:#0D1F3C;"></div><span class="donut-leg-label">Boys</span><span class="donut-leg-val">$232k</span><span class="donut-leg-pct">38%</span></div>
+              <div class="donut-leg-item" onclick="showToast('Girls: $196k')"><div class="donut-leg-dot" style="background:#1565C0;"></div><span class="donut-leg-label">Girls</span><span class="donut-leg-val">$196k</span><span class="donut-leg-pct">32%</span></div>
+              <div class="donut-leg-item" onclick="showToast('Embroidery: $98k')"><div class="donut-leg-dot" style="background:#E8A020;"></div><span class="donut-leg-label">Embroidery</span><span class="donut-leg-val">$98k</span><span class="donut-leg-pct">16%</span></div>
+              <div class="donut-leg-item" onclick="showToast('B2B/Schools: $55k')"><div class="donut-leg-dot" style="background:#1A7A4A;"></div><span class="donut-leg-label">B2B / Schools</span><span class="donut-leg-val">$55k</span><span class="donut-leg-pct">9%</span></div>
+              <div class="donut-leg-item" onclick="showToast('Other: $31k')"><div class="donut-leg-dot" style="background:#E4E8ED;"></div><span class="donut-leg-label">Other</span><span class="donut-leg-val">$31k</span><span class="donut-leg-pct">5%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP PRODUCTS + CONVERSION FUNNEL -->
+    <div class="grid-2" style="margin-bottom:16px;">
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🏆 Top Products by Revenue</div>
+          <div class="panel-actions">
+            <button class="panel-btn active" onclick="setProdSort(this)">Revenue</button>
+            <button class="panel-btn" onclick="setProdSort(this)">Units</button>
+            <button class="panel-btn" onclick="setProdSort(this)">Margin</button>
+          </div>
+        </div>
+        <div class="panel-body no-pad">
+          <table class="prod-table">
+            <thead><tr><th>#</th><th></th><th>Product</th><th>Revenue</th><th>Units</th><th>Margin</th><th>Trend</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="prod-rank gold">1</span></td>
+                <td><div class="prod-thumb-sm" style="background:linear-gradient(135deg,#D8E0EE,#C4CCDE);">👕</div></td>
+                <td><div class="prod-name-cell">Classic Piqué Polo</div><div class="prod-cat">Boys · Polos</div></td>
+                <td class="prod-rev">$142k</td>
+                <td class="prod-units">9,470</td>
+                <td><span style="color:var(--green);font-weight:700;">62%</span></td>
+                <td><div class="prod-trend trend-up">↑ 24%</div></td>
+              </tr>
+              <tr>
+                <td><span class="prod-rank silver">2</span></td>
+                <td><div class="prod-thumb-sm" style="background:linear-gradient(135deg,#EEE8F4,#E4DCF0);">👚</div></td>
+                <td><div class="prod-name-cell">Stretch Blend Blouse</div><div class="prod-cat">Girls · Blouses</div></td>
+                <td class="prod-rev">$88k</td>
+                <td class="prod-units">5,180</td>
+                <td><span style="color:var(--green);font-weight:700;">58%</span></td>
+                <td><div class="prod-trend trend-up">↑ 19%</div></td>
+              </tr>
+              <tr>
+                <td><span class="prod-rank bronze">3</span></td>
+                <td><div class="prod-thumb-sm" style="background:linear-gradient(135deg,#EDE8DC,#E0D8C8);">👖</div></td>
+                <td><div class="prod-name-cell">Adjustable Twill Pants</div><div class="prod-cat">Boys · Pants</div></td>
+                <td class="prod-rev">$76k</td>
+                <td class="prod-units">4,000</td>
+                <td><span style="color:var(--green);font-weight:700;">56%</span></td>
+                <td><div class="prod-trend trend-up">↑ 11%</div></td>
+              </tr>
+              <tr>
+                <td><span class="prod-rank">4</span></td>
+                <td><div class="prod-thumb-sm" style="background:linear-gradient(135deg,#D8E0EC,#CCD4E4);">🧥</div></td>
+                <td><div class="prod-name-cell">V-Neck Uniform Sweater</div><div class="prod-cat">Unisex · Sweaters</div></td>
+                <td class="prod-rev">$64k</td>
+                <td class="prod-units">2,780</td>
+                <td><span style="color:var(--green);font-weight:700;">61%</span></td>
+                <td><div class="prod-trend trend-up">↑ 16%</div></td>
+              </tr>
+              <tr>
+                <td><span class="prod-rank">5</span></td>
+                <td><div class="prod-thumb-sm" style="background:linear-gradient(135deg,#F0E4EC,#E4D4E0);">🥻</div></td>
+                <td><div class="prod-name-cell">Plaid Box Pleat Jumper</div><div class="prod-cat">Girls · Jumpers</div></td>
+                <td class="prod-rev">$58k</td>
+                <td class="prod-units">2,320</td>
+                <td><span style="color:var(--green);font-weight:700;">64%</span></td>
+                <td><div class="prod-trend trend-up">↑ 28%</div></td>
+              </tr>
+              <tr>
+                <td><span class="prod-rank">6</span></td>
+                <td><div class="prod-thumb-sm" style="background:linear-gradient(135deg,#E8EDF5,#D8E4F0);">👕</div></td>
+                <td><div class="prod-name-cell">Adaptive Easy-On Polo</div><div class="prod-cat">Unisex · Adaptive</div></td>
+                <td class="prod-rev">$41k</td>
+                <td class="prod-units">1,640</td>
+                <td><span style="color:var(--green);font-weight:700;">67%</span></td>
+                <td><div class="prod-trend trend-up">↑ 44%</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🔽 Conversion Funnel</div>
+          <button class="panel-btn" onclick="showToast('Viewing full funnel report...')">Detail →</button>
+        </div>
+        <div class="panel-body">
+          <div class="funnel">
+            <div class="funnel-step">
+              <div class="funnel-label">Site Visitors</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:100%;background:rgba(13,31,60,0.12);">
+                  <span class="funnel-bar-label" style="color:var(--navy);">184,200 visitors</span>
+                  <span class="funnel-bar-val" style="color:var(--navy);">100%</span>
+                </div>
+              </div>
+              <span class="funnel-pct"></span>
+            </div>
+            <div class="funnel-step">
+              <div class="funnel-label">School Search</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:68%;background:rgba(13,31,60,0.28);">
+                  <span class="funnel-bar-label" style="color:var(--navy);">125,256</span>
+                  <span class="funnel-bar-val" style="color:var(--navy);">68%</span>
+                </div>
+              </div>
+              <span class="funnel-pct" style="color:var(--green);">68%</span>
+            </div>
+            <div class="funnel-step">
+              <div class="funnel-label">Product View</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:52%;background:rgba(13,31,60,0.45);">
+                  <span class="funnel-bar-label">95,784</span>
+                  <span class="funnel-bar-val">52%</span>
+                </div>
+              </div>
+              <span class="funnel-pct" style="color:var(--green);">76%</span>
+            </div>
+            <div class="funnel-step">
+              <div class="funnel-label">Add to Cart</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:31%;background:rgba(13,31,60,0.65);">
+                  <span class="funnel-bar-label">57,102</span>
+                  <span class="funnel-bar-val">31%</span>
+                </div>
+              </div>
+              <span class="funnel-pct" style="color:var(--amber);">60%</span>
+            </div>
+            <div class="funnel-step">
+              <div class="funnel-label">Checkout Start</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:19%;background:rgba(13,31,60,0.80);">
+                  <span class="funnel-bar-label">35,004</span>
+                  <span class="funnel-bar-val">19%</span>
+                </div>
+              </div>
+              <span class="funnel-pct" style="color:var(--amber);">61%</span>
+            </div>
+            <div class="funnel-step">
+              <div class="funnel-label">Purchase ✓</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:13%;background:var(--navy);">
+                  <span class="funnel-bar-label">23,950</span>
+                  <span class="funnel-bar-val">13%</span>
+                </div>
+              </div>
+              <span class="funnel-pct" style="color:var(--green);">68%</span>
+            </div>
+          </div>
+          <div style="margin-top:14px;background:var(--blue-pale);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--navy);">
+            💡 <strong>Opportunity:</strong> Cart abandonment at 39%. Recovering 10% of abandoned carts = <strong>+$22k revenue</strong>. Consider email abandonment flow.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER HEATMAP + GEO -->
+    <div class="grid-2" style="margin-bottom:16px;">
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🗓 Order Volume Heatmap — 2025</div>
+          <button class="panel-btn" onclick="showToast('Viewing heatmap detail...')">Expand</button>
+        </div>
+        <div class="panel-body">
+          <div id="heatmapWrap"></div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:10px;color:var(--gray-400);">
+            <span>Less</span>
+            <div style="width:10px;height:10px;border-radius:2px;background:var(--gray-100);"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:rgba(13,31,60,0.15);"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:rgba(13,31,60,0.35);"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:rgba(13,31,60,0.65);"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:var(--navy);"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:var(--gold);"></div>
+            <span>BTS Peak</span>
+            <span style="margin-left:6px;">More</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🗺 Revenue by State</div>
+          <button class="panel-btn" onclick="showToast('Viewing full geo report...')">View Map →</button>
+        </div>
+        <div class="panel-body">
+          <div class="geo-list">
+            <div class="geo-row"><span class="geo-state">NJ</span><span class="geo-name">New Jersey</span><div class="geo-bar-wrap"><div class="geo-bar" style="width:100%;"></div></div><span class="geo-val">$241k</span></div>
+            <div class="geo-row"><span class="geo-state">NY</span><span class="geo-name">New York</span><div class="geo-bar-wrap"><div class="geo-bar" style="width:82%;"></div></div><span class="geo-val">$198k</span></div>
+            <div class="geo-row"><span class="geo-state">PA</span><span class="geo-name">Pennsylvania</span><div class="geo-bar-wrap"><div class="geo-bar" style="width:41%;"></div></div><span class="geo-val">$99k</span></div>
+            <div class="geo-row"><span class="geo-state">CT</span><span class="geo-name">Connecticut</span><div class="geo-bar-wrap"><div class="geo-bar" style="width:24%;"></div></div><span class="geo-val">$58k</span></div>
+            <div class="geo-row"><span class="geo-state">MA</span><span class="geo-name">Massachusetts</span><div class="geo-bar-wrap"><div class="geo-bar" style="width:14%;"></div></div><span class="geo-val">$34k</span></div>
+            <div class="geo-row"><span class="geo-state">MD</span><span class="geo-name">Maryland</span><div class="geo-bar-wrap"><div class="geo-bar" style="width:8%;"></div></div><span class="geo-val">$19k</span></div>
+            <div class="geo-row"><span class="geo-state">FL</span><span class="geo-name">Florida</span><div class="geo-bar-wrap"><div class="geo-bar" style="width:5%;"></div></div><span class="geo-val">$12k</span></div>
+            <div class="geo-row" style="margin-top:6px;padding-top:8px;border-top:1px solid var(--gray-100);">
+              <span class="geo-state" style="color:var(--gray-400);">+39</span>
+              <span class="geo-name" style="color:var(--gray-400);">other states</span>
+              <div class="geo-bar-wrap"><div class="geo-bar" style="width:22%;background:var(--gray-300);"></div></div>
+              <span class="geo-val" style="color:var(--gray-500);">$51k</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP SCHOOLS + CUSTOMER COHORT -->
+    <div class="grid-2" style="margin-bottom:16px;">
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🏫 Top Schools by Revenue</div>
+          <div class="panel-actions">
+            <button class="panel-btn active" onclick="setProdSort(this)">Revenue</button>
+            <button class="panel-btn" onclick="setProdSort(this)">Growth</button>
+            <button class="panel-btn" onclick="setProdSort(this)">Orders</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="hbar-list">
+            <div class="hbar-row"><span class="hbar-label">St. Mary's Academy</span><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:var(--navy);"></div></div><span class="hbar-val">$84k</span></div>
+            <div class="hbar-row"><span class="hbar-label">Lincoln Elementary</span><div class="hbar-track"><div class="hbar-fill" style="width:74%;background:var(--navy);"></div></div><span class="hbar-val">$62k</span></div>
+            <div class="hbar-row"><span class="hbar-label">Holy Cross School</span><div class="hbar-track"><div class="hbar-fill" style="width:59%;background:var(--navy);"></div></div><span class="hbar-val">$50k</span></div>
+            <div class="hbar-row"><span class="hbar-label">Sacred Heart</span><div class="hbar-track"><div class="hbar-fill" style="width:44%;background:var(--navy);"></div></div><span class="hbar-val">$37k</span></div>
+            <div class="hbar-row"><span class="hbar-label">JFK Middle School</span><div class="hbar-track"><div class="hbar-fill" style="width:31%;background:var(--navy);"></div></div><span class="hbar-val">$26k</span></div>
+            <div class="hbar-row"><span class="hbar-label">St. Francis Prep</span><div class="hbar-track"><div class="hbar-fill" style="width:24%;background:var(--navy);"></div></div><span class="hbar-val">$20k</span></div>
+            <div class="hbar-row"><span class="hbar-label">Immaculate Heart</span><div class="hbar-track"><div class="hbar-fill" style="width:17%;background:var(--navy);"></div></div><span class="hbar-val">$14k</span></div>
+            <div class="hbar-row"><span class="hbar-label">Brooklyn Prep</span><div class="hbar-track"><div class="hbar-fill" style="width:11%;background:var(--gold);"></div></div><span class="hbar-val" style="color:var(--amber);">$9k ↑</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🔄 Customer Retention Cohorts</div>
+          <button class="panel-btn" onclick="showToast('Viewing full cohort analysis...')">Full Report →</button>
+        </div>
+        <div class="panel-body no-pad">
+          <table class="cohort-table">
+            <thead>
+              <tr>
+                <th>Cohort</th>
+                <th>Month 0</th>
+                <th>M+1</th>
+                <th>M+3</th>
+                <th>M+6</th>
+                <th>M+12</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Aug '24 BTS</td>
+                <td><span class="cohort-cell cc-high">100%</span></td>
+                <td><span class="cohort-cell cc-mid">42%</span></td>
+                <td><span class="cohort-cell cc-low">28%</span></td>
+                <td><span class="cohort-cell cc-low">34%</span></td>
+                <td><span class="cohort-cell cc-mid">41%</span></td>
+              </tr>
+              <tr>
+                <td>Sep '24</td>
+                <td><span class="cohort-cell cc-high">100%</span></td>
+                <td><span class="cohort-cell cc-mid">38%</span></td>
+                <td><span class="cohort-cell cc-low">24%</span></td>
+                <td><span class="cohort-cell cc-low">31%</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+              </tr>
+              <tr>
+                <td>Jan '25</td>
+                <td><span class="cohort-cell cc-high">100%</span></td>
+                <td><span class="cohort-cell cc-mid">44%</span></td>
+                <td><span class="cohort-cell cc-low">29%</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+              </tr>
+              <tr>
+                <td>Mar '25</td>
+                <td><span class="cohort-cell cc-high">100%</span></td>
+                <td><span class="cohort-cell cc-mid">40%</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+              </tr>
+              <tr>
+                <td>Aug '25 BTS</td>
+                <td><span class="cohort-cell cc-high">100%</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+                <td><span class="cohort-cell cc-min">—</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:12px 16px;background:var(--green-pale);font-size:12px;color:var(--navy);border-top:1px solid rgba(26,122,74,0.12);">
+            ✓ <strong>BTS cohort insight:</strong> Back-to-School customers show 41% 12-month retention — 2.1× higher than off-season cohorts. Prioritize BTS acquisition.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI INSIGHTS + BTS FORECAST -->
+    <div class="grid-1-2" style="margin-bottom:0;">
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <!-- BTS countdown -->
+        <div class="bts-card">
+          <div class="bts-stars"></div>
+          <div class="bts-label">🚀 Season Forecast</div>
+          <div class="bts-title">Back-to-School 2026</div>
+          <div class="bts-counters">
+            <div class="bts-count"><div class="bts-num" id="btsDays">148</div><div class="bts-unit">DAYS</div></div>
+            <div class="bts-sep">:</div>
+            <div class="bts-count"><div class="bts-num">08</div><div class="bts-unit">HRS</div></div>
+            <div class="bts-sep">:</div>
+            <div class="bts-count"><div class="bts-num">22</div><div class="bts-unit">MIN</div></div>
+          </div>
+          <div class="bts-insight">
+            Based on 2025 BTS performance, forecast <strong>$284k in Aug–Sep revenue</strong> (+18% growth target). Start inventory buildup in <strong>May</strong>. Outreach to 2,041 schools begins <strong>April 1</strong>.
+          </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">🤖 AI Insights</div><button class="panel-btn" onclick="showToast('Generating new insights...')">Refresh</button></div>
+          <div class="panel-body" style="padding:12px 16px;">
+            <div class="insight-grid">
+              <div class="insight-card ic-gold" onclick="showToast('Viewing embroidery growth detail...')">
+                <div class="insight-icon">🧵</div>
+                <div class="insight-title">Embroidery growing fast</div>
+                <div class="insight-text">+31% YoY. Now 16% of revenue. Consider adding a 2nd machine before BTS.</div>
+              </div>
+              <div class="insight-card ic-blue" onclick="showToast('Viewing cart abandonment detail...')">
+                <div class="insight-icon">🛒</div>
+                <div class="insight-title">Cart abandonment at 39%</div>
+                <div class="insight-text">Email recovery flow could recover ~$22k. Industry avg is 28%.</div>
+              </div>
+              <div class="insight-card ic-green" onclick="showToast('Viewing adaptive product detail...')">
+                <div class="insight-icon">♿</div>
+                <div class="insight-title">Adaptive polo surging</div>
+                <div class="insight-text">+44% units. Only 3 SKU variants. Expand size range to capture demand.</div>
+              </div>
+              <div class="insight-card ic-red" onclick="showToast('Viewing stockout impact detail...')">
+                <div class="insight-icon">📦</div>
+                <div class="insight-title">Stockouts cost $18k</div>
+                <div class="insight-text">Navy Polo Sz 8 & Khaki 10S caused 214 lost orders YTD. Reorder threshold too low.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scheduled Reports -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📧 Scheduled Reports & Exports</div>
+          <button class="panel-btn" onclick="showToast('Creating new scheduled report...')">+ New</button>
+        </div>
+        <div class="panel-body no-pad">
+          <table class="mini-table">
+            <thead><tr><th>Report</th><th>Frequency</th><th>Recipients</th><th>Last Sent</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Daily Sales Summary</strong></td>
+                <td>Daily 7 AM</td>
+                <td>james@galaxy.com</td>
+                <td style="color:var(--green);font-weight:600;">Today</td>
+                <td><button class="panel-btn" onclick="showToast('Editing report...')">Edit</button></td>
+              </tr>
+              <tr>
+                <td><strong>Weekly Revenue + Orders</strong></td>
+                <td>Mon 8 AM</td>
+                <td>james@galaxy.com, warehouse@galaxy.com</td>
+                <td>Mar 3</td>
+                <td><button class="panel-btn" onclick="showToast('Editing report...')">Edit</button></td>
+              </tr>
+              <tr>
+                <td><strong>Inventory Reorder Alert</strong></td>
+                <td>When triggered</td>
+                <td>james@galaxy.com</td>
+                <td style="color:var(--amber);font-weight:600;">Today ⚠</td>
+                <td><button class="panel-btn" onclick="showToast('Editing report...')">Edit</button></td>
+              </tr>
+              <tr>
+                <td><strong>School Partner Monthly</strong></td>
+                <td>1st of month</td>
+                <td>james@galaxy.com, schools@galaxy.com</td>
+                <td>Mar 1</td>
+                <td><button class="panel-btn" onclick="showToast('Editing report...')">Edit</button></td>
+              </tr>
+              <tr>
+                <td><strong>Embroidery Queue Daily</strong></td>
+                <td>Daily 6 AM</td>
+                <td>emb@galaxy.com</td>
+                <td style="color:var(--green);font-weight:600;">Today</td>
+                <td><button class="panel-btn" onclick="showToast('Editing report...')">Edit</button></td>
+              </tr>
+              <tr>
+                <td><strong>BTS Forecast (Quarterly)</strong></td>
+                <td>Quarterly</td>
+                <td>james@galaxy.com</td>
+                <td>Jan 1</td>
+                <td><button class="panel-btn" onclick="showToast('Editing report...')">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:14px 18px;border-top:1px solid var(--gray-100);">
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;">Quick Export</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="panel-btn" onclick="showToast('Exporting Sales CSV...')">📊 Sales CSV</button>
+            <button class="panel-btn" onclick="showToast('Exporting Products CSV...')">👕 Products CSV</button>
+            <button class="panel-btn" onclick="showToast('Exporting Schools CSV...')">🏫 Schools CSV</button>
+            <button class="panel-btn" onclick="showToast('Exporting Customers CSV...')">👤 Customers CSV</button>
+            <button class="panel-btn" onclick="showToast('Exporting Inventory CSV...')">📦 Inventory CSV</button>
+            <button class="panel-btn active" onclick="showToast('Generating full PDF report...')">📄 Full PDF Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div class="toast" id="toast"><span>✓</span><span id="toastMsg">Done!</span></div>
+
+<script>
+  // Revenue chart
+  const months = ['M','A','M','J','J','A','S','O','N','D','J','F'];
+  const rev25 = [28,31,29,35,38,142,86,44,52,48,71,84];
+  const rev24 = [22,25,24,28,31,118,70,38,44,41,60,72];
+  const maxV = Math.max(...rev25, ...rev24);
+  const bts = [5,6];
+  const chart = document.getElementById('revenueChart');
+  months.forEach((m,i) => {
+    const col = document.createElement('div');
+    col.className = 'area-col';
+    const prevBar = document.createElement('div');
+    prevBar.className = 'area-bar rev-prev';
+    prevBar.style.height = (rev24[i]/maxV*152)+'px';
+    prevBar.setAttribute('data-tip', `2024: $${rev24[i]}k`);
+    const curBar = document.createElement('div');
+    curBar.className = 'area-bar ' + (bts.includes(i) ? 'bts' : 'rev');
+    curBar.style.height = (rev25[i]/maxV*152)+'px';
+    curBar.setAttribute('data-tip', `2025: $${rev25[i]}k`);
+    const lbl = document.createElement('div');
+    lbl.className = 'area-label'; lbl.textContent = m;
+    col.appendChild(prevBar); col.appendChild(curBar); col.appendChild(lbl);
+    chart.appendChild(col);
+  });
+
+  // Heatmap
+  const hwrap = document.getElementById('heatmapWrap');
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:flex;gap:2px;overflow-x:auto;';
+  const days = ['S','M','T','W','T','F','S'];
+  // day-of-week labels
+  const dayCol = document.createElement('div');
+  dayCol.style.cssText = 'display:flex;flex-direction:column;gap:2px;margin-right:2px;';
+  days.forEach(d => {
+    const el = document.createElement('div');
+    el.style.cssText = 'font-size:9px;color:var(--gray-400);height:11px;display:flex;align-items:center;font-weight:600;';
+    el.textContent = d;
+    dayCol.appendChild(el);
+  });
+  grid.appendChild(dayCol);
+
+  const btsPeakWeeks = [31,32,33,34];
+  for (let w = 0; w < 52; w++) {
+    const col = document.createElement('div');
+    col.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
+    for (let d = 0; d < 7; d++) {
+      const cell = document.createElement('div');
+      cell.style.cssText = 'width:11px;height:11px;border-radius:2px;cursor:pointer;transition:transform .15s;';
+      let cls = 'hm-0';
+      const rnd = Math.random();
+      if (btsPeakWeeks.includes(w)) { cls = rnd < 0.6 ? 'hm-peak' : 'hm-4'; }
+      else if (w < 4 || (w >= 18 && w < 22)) cls = rnd < 0.5 ? 'hm-2' : 'hm-1';
+      else if (rnd < 0.08) cls = 'hm-4';
+      else if (rnd < 0.22) cls = 'hm-3';
+      else if (rnd < 0.45) cls = 'hm-2';
+      else if (rnd < 0.65) cls = 'hm-1';
+      cell.className = cls;
+      // map to background color
+      const colorMap = { 'hm-0': 'var(--gray-100)', 'hm-1': 'rgba(13,31,60,0.15)', 'hm-2': 'rgba(13,31,60,0.35)', 'hm-3': 'rgba(13,31,60,0.6)', 'hm-4': 'var(--navy)', 'hm-peak': 'var(--gold)' };
+      cell.style.background = colorMap[cls];
+      cell.title = `Week ${w+1}, Day ${d+1}`;
+      cell.addEventListener('mouseover', () => { cell.style.transform = 'scale(1.3)'; });
+      cell.addEventListener('mouseout', () => { cell.style.transform = ''; });
+      col.appendChild(cell);
+    }
+    grid.appendChild(col);
+  }
+  hwrap.appendChild(grid);
+
+  function setRange(btn) {
+    document.querySelectorAll('.date-range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    showToast('Date range: ' + btn.textContent);
+  }
+  function setTab(el) {
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    showToast('Viewing: ' + el.textContent.trim());
+  }
+  function setProdSort(btn) {
+    btn.closest('.panel-actions').querySelectorAll('.panel-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    showToast('Sorted by: ' + btn.textContent);
+  }
+  function toggleChartMode(btn, mode) {
+    btn.closest('.panel-actions').querySelectorAll('.panel-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    showToast('Viewing: ' + mode + ' data');
+  }
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>

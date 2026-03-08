@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boys Polos – Galaxy Uniforms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1F3C;
+    --navy-mid: #1A3358;
+    --navy-light: #2A4A7A;
+    --gold: #E8A020;
+    --gold-light: #F5C050;
+    --cream: #FAFAF7;
+    --white: #FFFFFF;
+    --gray-50: #F8F9FA;
+    --gray-100: #F0F2F5;
+    --gray-200: #E4E8ED;
+    --gray-300: #CBD0D8;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --red: #C0392B;
+    --green: #1A7A4A;
+    --shadow-sm: 0 1px 4px rgba(13,31,60,0.07);
+    --shadow-md: 0 4px 20px rgba(13,31,60,0.11);
+    --shadow-lg: 0 12px 40px rgba(13,31,60,0.16);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--navy); }
+
+  /* ── UTIL BAR ── */
+  .util-bar { background: var(--navy); color: rgba(255,255,255,0.7); font-size: 12px; padding: 8px 0; }
+  .util-inner { max-width: 1380px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+  .util-links { display: flex; gap: 20px; }
+  .util-link { color: rgba(255,255,255,0.7); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color .2s; }
+  .util-link:hover { color: var(--gold-light); }
+  .util-cta { background: var(--gold); color: var(--navy); padding: 4px 12px; border-radius: 20px; font-weight: 700; text-decoration: none; font-size: 11px; }
+
+  /* ── HEADER ── */
+  header { background: var(--white); border-bottom: 1px solid var(--gray-100); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+  .header-inner { max-width: 1380px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 24px; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+  .logo-icon { width: 38px; height: 38px; background: var(--navy); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .logo-name { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 800; color: var(--navy); }
+  .logo-sub { font-size: 10px; font-weight: 500; color: var(--gray-500); letter-spacing: 1.5px; text-transform: uppercase; }
+  nav { display: flex; align-items: center; gap: 2px; }
+  .nav-link { font-size: 13.5px; font-weight: 500; color: var(--gray-700); text-decoration: none; padding: 7px 13px; border-radius: 8px; transition: all .2s; }
+  .nav-link:hover, .nav-link.active { background: var(--gray-100); color: var(--navy); font-weight: 600; }
+  .nav-school { background: var(--navy); color: var(--white); padding: 7px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 600; text-decoration: none; }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .icon-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; cursor: pointer; border-radius: 8px; color: var(--gray-700); transition: all .2s; position: relative; }
+  .icon-btn:hover { background: var(--gray-100); }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .cart-badge { position: absolute; top: 5px; right: 5px; width: 15px; height: 15px; background: var(--gold); border-radius: 50%; font-size: 8px; font-weight: 700; color: var(--navy); display: flex; align-items: center; justify-content: center; }
+  .btn-login { font-size: 13px; font-weight: 600; color: var(--navy); text-decoration: none; padding: 7px 14px; border: 1.5px solid var(--navy); border-radius: 8px; transition: all .2s; }
+  .btn-login:hover { background: var(--navy); color: var(--white); }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb { background: var(--white); border-bottom: 1px solid var(--gray-100); padding: 12px 0; }
+  .breadcrumb-inner { max-width: 1380px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray-500); }
+  .breadcrumb a { color: var(--gray-500); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--navy); }
+  .breadcrumb-sep { color: var(--gray-300); }
+  .breadcrumb-current { color: var(--navy); font-weight: 600; }
+
+  /* ── CATEGORY HERO ── */
+  .cat-hero {
+    background: linear-gradient(120deg, var(--navy) 0%, var(--navy-mid) 60%, #0A2040 100%);
+    padding: 36px 24px; position: relative; overflow: hidden;
+  }
+  .cat-hero-stars {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 8% 25%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 70%, rgba(232,160,32,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 45% 15%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 80% 30%, rgba(232,160,32,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 75%, rgba(255,255,255,0.3) 0%, transparent 100%);
+  }
+  .cat-hero-inner { max-width: 1380px; margin: 0 auto; position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  .cat-hero-left {}
+  .cat-hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-light); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .cat-hero-eyebrow::before { content: ''; width: 20px; height: 2px; background: var(--gold); }
+  .cat-hero h1 { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 800; color: var(--white); line-height: 1.1; margin-bottom: 10px; }
+  .cat-hero-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 18px; }
+  .cat-hero-stats { display: flex; gap: 24px; }
+  .cat-stat { text-align: center; }
+  .cat-stat-num { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: var(--gold-light); }
+  .cat-stat-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .cat-hero-right { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cat-sibling {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.8); padding: 8px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; text-decoration: none; transition: all .2s; display: flex; align-items: center; gap: 6px;
+  }
+  .cat-sibling:hover, .cat-sibling.active { background: rgba(255,255,255,0.2); color: var(--white); }
+  .cat-sibling.active { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 700; }
+
+  /* ── SCHOOL APPROVED BANNER ── */
+  .approved-banner {
+    background: rgba(26,122,74,0.08); border-bottom: 1px solid rgba(26,122,74,0.2);
+    padding: 10px 24px;
+  }
+  .approved-inner { max-width: 1380px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .approved-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--green); font-weight: 600; }
+  .approved-right { font-size: 12px; color: var(--gray-500); }
+  .approved-right a { color: var(--navy); font-weight: 600; }
+
+  /* ── MAIN LAYOUT ── */
+  .page-body { max-width: 1380px; margin: 0 auto; padding: 28px 24px 60px; display: grid; grid-template-columns: 268px 1fr; gap: 32px; align-items: start; }
+
+  /* ── FILTERS SIDEBAR ── */
+  .filters-sidebar { position: sticky; top: 88px; }
+  .filters-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .filters-title { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .filters-clear { font-size: 12px; color: var(--red); font-weight: 600; cursor: pointer; border: none; background: none; font-family: 'DM Sans', sans-serif; }
+  .filters-clear:hover { text-decoration: underline; }
+  .active-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .active-filter { background: var(--navy); color: var(--white); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .active-filter span { opacity: 0.7; font-size: 13px; }
+
+  .filter-group { border-bottom: 1px solid var(--gray-200); padding: 16px 0; }
+  .filter-group:last-child { border-bottom: none; }
+  .filter-group-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 12px; }
+  .filter-group-title { font-size: 13px; font-weight: 700; color: var(--navy); letter-spacing: 0.3px; }
+  .filter-toggle { font-size: 16px; color: var(--gray-500); transition: transform .2s; }
+  .filter-toggle.open { transform: rotate(180deg); }
+  .filter-options { display: flex; flex-direction: column; gap: 8px; }
+  .filter-opt { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .filter-checkbox { width: 16px; height: 16px; border: 1.5px solid var(--gray-300); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+  .filter-opt.checked .filter-checkbox { background: var(--navy); border-color: var(--navy); }
+  .filter-opt.checked .filter-checkbox::after { content: '✓'; font-size: 10px; color: white; font-weight: 700; }
+  .filter-opt-label { font-size: 13px; color: var(--gray-700); flex: 1; }
+  .filter-opt-count { font-size: 11px; color: var(--gray-400); }
+  .filter-opt:hover .filter-checkbox { border-color: var(--navy); }
+  .filter-opt:hover .filter-opt-label { color: var(--navy); }
+
+  /* color filter */
+  .filter-colors { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-color {
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+    border: 2.5px solid transparent; outline: 2px solid transparent;
+    transition: all .15s; position: relative;
+  }
+  .filter-color.active { outline: 2px solid var(--navy); outline-offset: 2px; }
+  .filter-color:hover { transform: scale(1.15); }
+
+  /* size filter */
+  .filter-sizes { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-size { width: 36px; height: 32px; border: 1.5px solid var(--gray-300); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--navy); transition: all .15s; }
+  .filter-size.active { background: var(--navy); color: white; border-color: var(--navy); font-weight: 700; }
+  .filter-size:hover:not(.active) { border-color: var(--navy); }
+
+  /* price range */
+  .price-range-display { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 10px; }
+  .price-slider { width: 100%; height: 4px; border-radius: 2px; background: var(--gray-200); position: relative; cursor: pointer; }
+  .price-slider-fill { position: absolute; height: 100%; background: var(--navy); border-radius: 2px; left: 0%; width: 65%; }
+  .price-slider input[type=range] { width: 100%; -webkit-appearance: none; background: transparent; margin: 0; cursor: pointer; }
+  .price-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--navy); border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+
+  /* ── PRODUCTS AREA ── */
+  .products-area {}
+
+  /* toolbar */
+  .products-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; flex-wrap: wrap; }
+  .toolbar-left { display: flex; align-items: center; gap: 12px; }
+  .results-count { font-size: 14px; color: var(--gray-500); }
+  .results-count strong { color: var(--navy); font-weight: 700; }
+  .toolbar-right { display: flex; align-items: center; gap: 10px; }
+  .sort-select {
+    padding: 8px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+    font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none;
+    background: var(--white); cursor: pointer; font-weight: 500;
+  }
+  .view-toggle { display: flex; gap: 4px; }
+  .view-btn { width: 34px; height: 34px; border: 1.5px solid var(--gray-200); border-radius: 7px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--white); transition: all .15s; }
+  .view-btn.active { background: var(--navy); border-color: var(--navy); }
+  .view-btn svg { width: 16px; height: 16px; color: var(--gray-500); }
+  .view-btn.active svg { color: white; }
+  .mobile-filter-btn { display: none; background: var(--navy); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; align-items: center; gap: 6px; }
+
+  /* product grid */
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .product-grid.list-view { grid-template-columns: 1fr; }
+
+  .product-card {
+    background: var(--white); border-radius: 16px; overflow: hidden;
+    border: 1.5px solid var(--gray-200); cursor: pointer; transition: all .25s;
+    display: flex; flex-direction: column;
+  }
+  .product-card:hover { border-color: var(--navy); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+  .product-card.list-view { flex-direction: row; border-radius: 12px; }
+
+  .product-img-wrap {
+    aspect-ratio: 1; background: var(--gray-100); display: flex; align-items: center;
+    justify-content: center; font-size: 64px; position: relative; overflow: hidden; flex-shrink: 0;
+  }
+  .product-card.list-view .product-img-wrap { width: 180px; aspect-ratio: auto; height: 180px; border-radius: 0; }
+  .product-img-wrap .hover-img { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 64px; opacity: 0; transition: opacity .25s; background: var(--gray-50); }
+  .product-card:hover .hover-img { opacity: 1; }
+
+  .prod-badge { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 6px; letter-spacing: 0.4px; }
+  .badge-approved { background: var(--green); color: white; }
+  .badge-sale { background: var(--red); color: white; }
+  .badge-new { background: var(--navy); color: white; }
+  .badge-popular { background: var(--gold); color: var(--navy); }
+  .prod-wishlist { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0; transition: opacity .2s; cursor: pointer; }
+  .product-card:hover .prod-wishlist { opacity: 1; }
+  .prod-quick-add {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--navy); color: white; border: none; padding: 11px;
+    font-size: 12px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer;
+    transform: translateY(100%); transition: transform .25s; display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .product-card:hover .prod-quick-add { transform: translateY(0); }
+
+  .product-details { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
+  .product-card.list-view .product-details { padding: 20px 24px; justify-content: center; }
+  .prod-swatches { display: flex; gap: 5px; margin-bottom: 8px; }
+  .prod-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--gray-300); cursor: pointer; transition: transform .15s; }
+  .prod-swatch:hover { transform: scale(1.2); }
+  .prod-name { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 3px; line-height: 1.3; }
+  .prod-meta { font-size: 11px; color: var(--gray-500); margin-bottom: 8px; }
+  .prod-price-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .prod-price { font-size: 16px; font-weight: 800; color: var(--navy); }
+  .prod-price-was { font-size: 12px; color: var(--gray-400); text-decoration: line-through; }
+  .prod-price-save { font-size: 11px; color: var(--green); font-weight: 700; }
+  .prod-rating { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray-500); }
+  .prod-stars { color: var(--gold); font-size: 12px; }
+  .prod-sizes-preview { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+  .prod-size-tag { font-size: 10px; color: var(--gray-500); border: 1px solid var(--gray-200); padding: 2px 6px; border-radius: 4px; }
+  .prod-size-tag.low { color: var(--red); border-color: rgba(192,57,43,0.3); }
+  .prod-school-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(26,122,74,0.08); color: var(--green); font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px; margin-top: 6px; }
+
+  /* list view extras */
+  .prod-list-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .prod-list-atc { background: var(--navy); color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .prod-list-wish { border: 1.5px solid var(--gray-300); background: white; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+
+  /* collection tabs */
+  .collection-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+  .coll-tab {
+    padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--gray-200); cursor: pointer; white-space: nowrap;
+    background: var(--white); color: var(--gray-700); transition: all .2s;
+  }
+  .coll-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .coll-tab:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
+
+  /* school popular banner */
+  .school-popular { background: linear-gradient(90deg, rgba(13,31,60,0.04), rgba(232,160,32,0.06)); border: 1.5px solid var(--gold); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+  .sp-icon { font-size: 24px; flex-shrink: 0; }
+  .sp-text { font-size: 13px; color: var(--navy); flex: 1; }
+  .sp-text strong { font-weight: 700; }
+  .sp-btn { background: var(--gold); color: var(--navy); border: none; padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+
+  /* load more */
+  .load-more { text-align: center; margin-top: 40px; }
+  .btn-load-more { background: var(--white); color: var(--navy); border: 2px solid var(--navy); padding: 13px 40px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; }
+  .btn-load-more:hover { background: var(--navy); color: white; }
+  .load-progress { font-size: 12px; color: var(--gray-500); margin-top: 10px; }
+  .load-bar { width: 200px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 8px auto 0; overflow: hidden; }
+  .load-bar-fill { height: 100%; background: var(--navy); border-radius: 2px; width: 45%; }
+
+  /* recently viewed */
+  .recently-viewed { background: var(--white); border-top: 1px solid var(--gray-100); padding: 40px 24px; margin-top: 20px; }
+  .rv-inner { max-width: 1380px; margin: 0 auto; }
+  .rv-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 16px; }
+  .rv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .rv-card { border-radius: 12px; overflow: hidden; cursor: pointer; background: var(--gray-50); border: 1.5px solid var(--gray-200); transition: all .2s; }
+  .rv-card:hover { border-color: var(--navy); transform: translateY(-2px); }
+  .rv-img { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .rv-info { padding: 10px 12px; }
+  .rv-name { font-size: 12px; font-weight: 600; color: var(--navy); }
+  .rv-price { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
+  /* mobile */
+  .mobile-filter-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; }
+  .mobile-filter-panel { position: fixed; left: 0; bottom: 0; top: 0; width: 300px; background: white; z-index: 301; overflow-y: auto; padding: 20px; transform: translateX(-100%); transition: transform .3s; }
+  .mobile-filter-panel.open { transform: translateX(0); }
+  .mfp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .mfp-close { font-size: 24px; cursor: pointer; color: var(--gray-500); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 1024px) {
+    .page-body { grid-template-columns: 1fr; }
+    .filters-sidebar { display: none; }
+    .mobile-filter-btn { display: flex; }
+    .product-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    nav { display: none; }
+    .util-links { display: none; }
+    .cat-hero h1 { font-size: 26px; }
+    .cat-hero-right { display: none; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    .rv-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- UTIL BAR -->
+<div class="util-bar">
+  <div class="util-inner">
+    <div class="util-links">
+      <a href="#" class="util-link">☎ 1-800-GALAXY-U</a>
+      <a href="#" class="util-link">📦 Track Order</a>
+      <a href="#" class="util-link">Bulk Orders Portal</a>
+    </div>
+    <a href="#" class="util-cta">🏫 Find Your School</a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="galaxy-uniforms-homepage.html" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" style="width:20px;height:20px;">
+          <circle cx="12" cy="12" r="3" fill="#E8A020"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#E8A020" stroke-width="1.5" fill="none"/>
+          <path d="M2 12 Q7 7 12 12 Q17 17 22 12" stroke="rgba(255,255,255,0.4)" stroke-width="1" fill="none"/>
+          <circle cx="6" cy="8" r="1" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">Galaxy Uniforms</div>
+        <div class="logo-sub">School Apparel</div>
+      </div>
+    </a>
+    <nav>
+      <a href="#" class="nav-link active">Boys</a>
+      <a href="galaxy-uniforms-category.html" class="nav-link">Girls</a>
+      <a href="galaxy-uniforms-category.html" class="nav-link">Categories</a>
+      <a href="#" class="nav-link">Bundles</a>
+      <a href="#" class="nav-link">For Schools</a>
+      <a href="#" class="nav-school">🏫 Find Your School</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </button>
+      <a href="galaxy-uniforms-account.html" class="btn-login">Login</a>
+      <button class="icon-btn">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <span class="cart-badge">3</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="breadcrumb-inner">
+    <a href="#">Home</a><span class="breadcrumb-sep">›</span>
+    <a href="#">Boys</a><span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Polos</span>
+  </div>
+</div>
+
+<!-- CATEGORY HERO -->
+<div class="cat-hero">
+  <div class="cat-hero-stars"></div>
+  <div class="cat-hero-inner">
+    <div class="cat-hero-left">
+      <div class="cat-hero-eyebrow">Boys Collection</div>
+      <h1>Boys Polos</h1>
+      <p class="cat-hero-sub">School-approved styles in every fit, color & fabric</p>
+      <div class="cat-hero-stats">
+        <div class="cat-stat"><div class="cat-stat-num">48</div><div class="cat-stat-label">Styles</div></div>
+        <div class="cat-stat"><div class="cat-stat-num">8</div><div class="cat-stat-label">Colors</div></div>
+        <div class="cat-stat"><div class="cat-stat-num">3</div><div class="cat-stat-label">Fits</div></div>
+        <div class="cat-stat"><div class="cat-stat-num">2,000+</div><div class="cat-stat-label">Schools Served</div></div>
+      </div>
+    </div>
+    <div class="cat-hero-right">
+      <a href="#" class="cat-sibling active">👕 Polos</a>
+      <a href="#" class="cat-sibling">👚 Shirts</a>
+      <a href="#" class="cat-sibling">👖 Pants</a>
+      <a href="#" class="cat-sibling">🩳 Shorts</a>
+      <a href="#" class="cat-sibling">🧥 Sweaters</a>
+      <a href="#" class="cat-sibling">🎽 Accessories</a>
+    </div>
+  </div>
+</div>
+
+<!-- SCHOOL APPROVED BANNER -->
+<div class="approved-banner">
+  <div class="approved-inner">
+    <div class="approved-left">
+      ✓ Showing items approved for <strong style="margin-left:4px;">St. Mary's Academy</strong>
+      <span style="background:rgba(26,122,74,0.12); padding:2px 8px; border-radius:4px; font-size:11px;">Navy · White · Burgundy</span>
+    </div>
+    <div class="approved-right">Not your school? <a href="#">Change school →</a></div>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <!-- FILTERS SIDEBAR -->
+  <aside class="filters-sidebar">
+    <div class="filters-header">
+      <span class="filters-title">Filters</span>
+      <button class="filters-clear" onclick="clearFilters()">Clear all</button>
+    </div>
+
+    <div class="active-filters" id="activeFilters">
+      <div class="active-filter">Boys <span>×</span></div>
+      <div class="active-filter">Navy <span>×</span></div>
+    </div>
+
+    <!-- COLOR -->
+    <div class="filter-group">
+      <div class="filter-group-header" onclick="toggleGroup(this)">
+        <span class="filter-group-title">Color</span>
+        <span class="filter-toggle open">▾</span>
+      </div>
+      <div class="filter-options">
+        <div class="filter-colors">
+          <div class="filter-color active" style="background:#0D1F3C;" title="Navy" onclick="this.classList.toggle('active')"></div>
+          <div class="filter-color" style="background:#FFFFFF; border:1.5px solid #E0E0E0;" title="White" onclick="this.classList.toggle('active')"></div>
+          <div class="filter-color" style="background:#C0392B;" title="Burgundy" onclick="this.classList.toggle('active')"></div>
+          <div class="filter-color" style="background:#2E7D32;" title="Forest Green" onclick="this.classList.toggle('active')"></div>
+          <div class="filter-color" style="background:#1565C0;" title="Royal Blue" onclick="this.classList.toggle('active')"></div>
+          <div class="filter-color" style="background:#FBC02D;" title="Gold" onclick="this.classList.toggle('active')"></div>
+          <div class="filter-color" style="background:#616161;" title="Gray" onclick="this.classList.toggle('active')"></div>
+          <div class="filter-color" style="background:#6D4C41;" title="Brown" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIZE -->
+    <div class="filter-group">
+      <div class="filter-group-header" onclick="toggleGroup(this)">
+        <span class="filter-group-title">Size</span>
+        <span class="filter-toggle open">▾</span>
+      </div>
+      <div class="filter-options">
+        <div class="filter-sizes">
+          <div class="filter-size" onclick="this.classList.toggle('active')">4</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">5</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">6</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">7</div>
+          <div class="filter-size active" onclick="this.classList.toggle('active')">8</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">10</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">12</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">14</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">16</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">18</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">20</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">XS</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">S</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">M</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">L</div>
+          <div class="filter-size" onclick="this.classList.toggle('active')">XL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIT -->
+    <div class="filter-group">
+      <div class="filter-group-header" onclick="toggleGroup(this)">
+        <span class="filter-group-title">Fit</span>
+        <span class="filter-toggle open">▾</span>
+      </div>
+      <div class="filter-options">
+        <div class="filter-opt checked" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Regular</span>
+          <span class="filter-opt-count">28</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Slim Fit</span>
+          <span class="filter-opt-count">12</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Husky / Plus</span>
+          <span class="filter-opt-count">8</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FABRIC -->
+    <div class="filter-group">
+      <div class="filter-group-header" onclick="toggleGroup(this)">
+        <span class="filter-group-title">Fabric</span>
+        <span class="filter-toggle open">▾</span>
+      </div>
+      <div class="filter-options">
+        <div class="filter-opt checked" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">100% Cotton Piqué</span>
+          <span class="filter-opt-count">18</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Performance Blend</span>
+          <span class="filter-opt-count">10</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Wrinkle-Free</span>
+          <span class="filter-opt-count">8</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Moisture-Wicking</span>
+          <span class="filter-opt-count">6</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Stretch Blend</span>
+          <span class="filter-opt-count">6</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLEEVE -->
+    <div class="filter-group">
+      <div class="filter-group-header" onclick="toggleGroup(this)">
+        <span class="filter-group-title">Sleeve Length</span>
+        <span class="filter-toggle open">▾</span>
+      </div>
+      <div class="filter-options">
+        <div class="filter-opt checked" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Short Sleeve</span>
+          <span class="filter-opt-count">32</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Long Sleeve</span>
+          <span class="filter-opt-count">16</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICE -->
+    <div class="filter-group">
+      <div class="filter-group-header" onclick="toggleGroup(this)">
+        <span class="filter-group-title">Price Range</span>
+        <span class="filter-toggle open">▾</span>
+      </div>
+      <div class="filter-options">
+        <div class="price-range-display">
+          <span>$0</span><span id="priceMax">$35</span>
+        </div>
+        <input type="range" min="0" max="60" value="35" style="width:100%; accent-color:var(--navy);" oninput="document.getElementById('priceMax').textContent='$'+this.value">
+      </div>
+    </div>
+
+    <!-- EMBROIDERY -->
+    <div class="filter-group">
+      <div class="filter-group-header" onclick="toggleGroup(this)">
+        <span class="filter-group-title">Features</span>
+        <span class="filter-toggle open">▾</span>
+      </div>
+      <div class="filter-options">
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Embroidery Available</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">Stain-Resistant</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">School Approved Only</span>
+        </div>
+        <div class="filter-opt" onclick="this.classList.toggle('checked')">
+          <div class="filter-checkbox"></div>
+          <span class="filter-opt-label">On Sale</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PRODUCTS AREA -->
+  <div class="products-area">
+
+    <!-- SCHOOL POPULAR -->
+    <div class="school-popular">
+      <div class="sp-icon">⭐</div>
+      <div class="sp-text"><strong>Most popular at St. Mary's Academy:</strong> Classic Piqué Polo in Navy is their #1 ordered item this season — <strong>47 families</strong> ordered it in the last 30 days.</div>
+      <button class="sp-btn">Shop School Pack →</button>
+    </div>
+
+    <!-- COLLECTION TABS -->
+    <div class="collection-tabs">
+      <div class="coll-tab active" onclick="selectTab(this)">All Polos</div>
+      <div class="coll-tab" onclick="selectTab(this)">⚡ Performance</div>
+      <div class="coll-tab" onclick="selectTab(this)">✨ Wrinkle-Free</div>
+      <div class="coll-tab" onclick="selectTab(this)">🛡️ Stain-Resistant</div>
+      <div class="coll-tab" onclick="selectTab(this)">💪 Husky Fit</div>
+      <div class="coll-tab" onclick="selectTab(this)">🔥 On Sale</div>
+      <div class="coll-tab" onclick="selectTab(this)">🆕 New Arrivals</div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="products-toolbar">
+      <div class="toolbar-left">
+        <button class="mobile-filter-btn" onclick="openMobileFilters()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+          Filters (2)
+        </button>
+        <span class="results-count">Showing <strong>48</strong> boys polos</span>
+      </div>
+      <div class="toolbar-right">
+        <select class="sort-select" id="sortSelect">
+          <option>Sort: Most Popular</option>
+          <option>Sort: Price Low–High</option>
+          <option>Sort: Price High–Low</option>
+          <option>Sort: Newest</option>
+          <option>Sort: Best Rated</option>
+          <option>Sort: School Approved First</option>
+        </select>
+        <div class="view-toggle">
+          <div class="view-btn active" onclick="setView('grid', this)" title="Grid view">
+            <svg fill="currentColor" viewBox="0 0 16 16"><path d="M1 2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1zM1 7a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1zM1 12a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1z"/></svg>
+          </div>
+          <div class="view-btn" onclick="setView('list', this)" title="List view">
+            <svg fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div class="product-grid" id="productGrid">
+
+      <!-- Card 1 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#D8E0EE,#C0CCDE);">
+          <span>👕</span>
+          <div class="hover-img">🔵</div>
+          <div class="prod-badge badge-popular">⚡ Best Seller</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#fff; border-color:#ccc;"></div>
+            <div class="prod-swatch" style="background:#C0392B;"></div>
+          </div>
+          <div class="prod-name">Classic Piqué Polo</div>
+          <div class="prod-meta">Short Sleeve · 100% Cotton · Regular Fit</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$14.99</span>
+            <span class="prod-price-save">Buy 3, save 10%</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (312)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">4</span><span class="prod-size-tag">5</span><span class="prod-size-tag">6</span><span class="prod-size-tag">7</span><span class="prod-size-tag">8</span><span class="prod-size-tag">10</span><span class="prod-size-tag">12</span><span class="prod-size-tag low">18 ⚠</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#EAEAEA,#D8D8D8);">
+          <span>👕</span>
+          <div class="hover-img">⚪</div>
+          <div class="prod-badge badge-approved">✓ Approved</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#fff; border-color:#ccc;"></div>
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#1565C0;"></div>
+          </div>
+          <div class="prod-name">Performance Polo — Moisture-Wicking</div>
+          <div class="prod-meta">Short Sleeve · Poly-Cotton Blend · Regular & Slim</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$17.99</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★½</span> 4.7 (89)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">4</span><span class="prod-size-tag">6</span><span class="prod-size-tag">8</span><span class="prod-size-tag">10</span><span class="prod-size-tag">12</span><span class="prod-size-tag">14</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#EDE8E0,#DDD6C8);">
+          <span>👕</span>
+          <div class="hover-img">🟤</div>
+          <div class="prod-badge badge-new">🆕 New</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#2E7D32;"></div>
+            <div class="prod-swatch" style="background:#6D4C41;"></div>
+            <div class="prod-swatch" style="background:#616161;"></div>
+          </div>
+          <div class="prod-name">Stretch Blend Polo — 4-Way Flex</div>
+          <div class="prod-meta">Short Sleeve · Stretch Cotton · All Fits</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$19.99</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★★</span> 5.0 (14)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">4</span><span class="prod-size-tag">6</span><span class="prod-size-tag">8</span><span class="prod-size-tag">10</span><span class="prod-size-tag">12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#D8E4D8,#C4D4C4);">
+          <span>👕</span>
+          <div class="hover-img">🟢</div>
+          <div class="prod-badge badge-sale">SALE</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#2E7D32;"></div>
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#C0392B;"></div>
+          </div>
+          <div class="prod-name">Classic Piqué Polo — Long Sleeve</div>
+          <div class="prod-meta">Long Sleeve · 100% Cotton · Regular Fit</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$13.99</span>
+            <span class="prod-price-was">$18.99</span>
+            <span class="prod-price-save">Save 26%</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★</span> 4.4 (56)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">5</span><span class="prod-size-tag">6</span><span class="prod-size-tag">8</span><span class="prod-size-tag">10</span><span class="prod-size-tag">14</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#D8DCF0,#C4C8E0);">
+          <span>👕</span>
+          <div class="hover-img">🔵</div>
+          <div class="prod-badge badge-approved">✓ Approved</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#1565C0;"></div>
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#fff; border-color:#ccc;"></div>
+          </div>
+          <div class="prod-name">Wrinkle-Free Oxford Polo</div>
+          <div class="prod-meta">Short Sleeve · No-Iron Fabric · Regular Fit</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$22.99</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.8 (143)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">4</span><span class="prod-size-tag">6</span><span class="prod-size-tag">8</span><span class="prod-size-tag">10</span><span class="prod-size-tag">12</span><span class="prod-size-tag">14</span><span class="prod-size-tag">16</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#F0D8D8,#E4C8C8);">
+          <span>👕</span>
+          <div class="hover-img">🔴</div>
+          <div class="prod-badge badge-approved">✓ Approved</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#C0392B;"></div>
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#fff; border-color:#ccc;"></div>
+          </div>
+          <div class="prod-name">Husky Fit Piqué Polo</div>
+          <div class="prod-meta">Short Sleeve · Cotton Blend · Husky Fit</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$15.99</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (78)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">8H</span><span class="prod-size-tag">10H</span><span class="prod-size-tag">12H</span><span class="prod-size-tag">14H</span><span class="prod-size-tag">16H</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#E8EDF5,#D4DCE8);">
+          <span>👕</span>
+          <div class="hover-img">🌊</div>
+          <div class="prod-badge badge-new">🆕 New</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#616161;"></div>
+            <div class="prod-swatch" style="background:#FBC02D;"></div>
+          </div>
+          <div class="prod-name">Adaptive Easy-On Polo</div>
+          <div class="prod-meta">Magnetic Buttons · Sensory-Friendly · All Fits</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$24.99</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★★</span> 5.0 (31)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">4</span><span class="prod-size-tag">6</span><span class="prod-size-tag">8</span><span class="prod-size-tag">10</span><span class="prod-size-tag">12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#EEE8D8,#E4DCC8);">
+          <span>👕</span>
+          <div class="hover-img">⭐</div>
+          <div class="prod-badge badge-sale">SALE</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#FBC02D;"></div>
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+          </div>
+          <div class="prod-name">Premium Piqué Polo — 250 GSM</div>
+          <div class="prod-meta">Short Sleeve · Heavy Cotton · Regular Fit</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$18.99</span>
+            <span class="prod-price-was">$26.99</span>
+            <span class="prod-price-save">Save 30%</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★</span> 4.6 (44)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">6</span><span class="prod-size-tag">8</span><span class="prod-size-tag">10</span><span class="prod-size-tag">12</span><span class="prod-size-tag low">14 ⚠</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="product-card" onclick="window.location='galaxy-uniforms-product.html'" style="cursor:pointer;">
+        <div class="product-img-wrap" style="background:linear-gradient(135deg,#D8EAD8,#C4DCC4);">
+          <span>👕</span>
+          <div class="hover-img">🌿</div>
+          <div class="prod-badge badge-approved">✓ Approved</div>
+          <div class="prod-wishlist">🤍</div>
+          <button class="prod-quick-add">+ Quick Add</button>
+        </div>
+        <div class="product-details">
+          <div class="prod-swatches">
+            <div class="prod-swatch" style="background:#2E7D32;"></div>
+            <div class="prod-swatch" style="background:#0D1F3C;"></div>
+            <div class="prod-swatch" style="background:#fff; border-color:#ccc;"></div>
+            <div class="prod-swatch" style="background:#C0392B;"></div>
+          </div>
+          <div class="prod-name">Slim Fit Performance Polo</div>
+          <div class="prod-meta">Short Sleeve · Stretch Poly · Slim Fit</div>
+          <div class="prod-price-row">
+            <span class="prod-price">$19.99</span>
+          </div>
+          <div class="prod-rating"><span class="prod-stars">★★★★½</span> 4.7 (62)</div>
+          <div class="prod-school-badge">✓ School Approved</div>
+          <div class="prod-sizes-preview">
+            <span class="prod-size-tag">XS</span><span class="prod-size-tag">S</span><span class="prod-size-tag">M</span><span class="prod-size-tag">L</span><span class="prod-size-tag">XL</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /product-grid -->
+
+    <div class="load-more">
+      <button class="btn-load-more">Load More Products</button>
+      <div class="load-progress">Showing 9 of 48 products</div>
+      <div class="load-bar"><div class="load-bar-fill"></div></div>
+    </div>
+
+  </div><!-- /products-area -->
+</div><!-- /page-body -->
+
+<!-- RECENTLY VIEWED -->
+<div class="recently-viewed">
+  <div class="rv-inner">
+    <div class="rv-title">Recently Viewed</div>
+    <div class="rv-grid">
+      <div class="rv-card"><div class="rv-img" style="background:linear-gradient(135deg,#F0EAD6,#E0D4BC);">👖</div><div class="rv-info"><div class="rv-name">Twill Pants</div><div class="rv-price">$18.99</div></div></div>
+      <div class="rv-card"><div class="rv-img" style="background:linear-gradient(135deg,#E8EDF5,#D0D8E8);">🧥</div><div class="rv-info"><div class="rv-name">V-Neck Sweater</div><div class="rv-price">$22.99</div></div></div>
+      <div class="rv-card"><div class="rv-img" style="background:linear-gradient(135deg,#E8EDF5,#D0D8E8);">👕</div><div class="rv-info"><div class="rv-name">Classic Polo (White)</div><div class="rv-price">$14.99</div></div></div>
+      <div class="rv-card"><div class="rv-img" style="background:linear-gradient(135deg,#E0E8E0,#D0DCD0);">🩳</div><div class="rv-info"><div class="rv-name">Uniform Shorts</div><div class="rv-price">$13.99</div></div></div>
+      <div class="rv-card"><div class="rv-img" style="background:linear-gradient(135deg,#E8EDF5,#D8E0EC);">👚</div><div class="rv-info"><div class="rv-name">Oxford Shirt</div><div class="rv-price">$17.99</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE FILTER OVERLAY -->
+<div class="mobile-filter-overlay" id="mfOverlay" onclick="closeMobileFilters()"></div>
+<div class="mobile-filter-panel" id="mfPanel">
+  <div class="mfp-header">
+    <span style="font-size:16px; font-weight:700; color:var(--navy);">Filters</span>
+    <span class="mfp-close" onclick="closeMobileFilters()">✕</span>
+  </div>
+  <p style="font-size:13px; color:var(--gray-500);">Filter options available on desktop sidebar.</p>
+  <button onclick="closeMobileFilters()" style="margin-top:20px; width:100%; background:var(--navy); color:white; border:none; padding:14px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif;">Apply Filters</button>
+</div>
+
+<script>
+  // Filter group toggle
+  function toggleGroup(header) {
+    const toggle = header.querySelector('.filter-toggle');
+    const options = header.nextElementSibling;
+    const isOpen = toggle.classList.contains('open');
+    toggle.classList.toggle('open', !isOpen);
+    options.style.display = isOpen ? 'none' : '';
+  }
+
+  // Collection tabs
+  function selectTab(el) {
+    document.querySelectorAll('.coll-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // View toggle
+  function setView(mode, btn) {
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const grid = document.getElementById('productGrid');
+    if (mode === 'list') {
+      grid.classList.add('list-view');
+      grid.querySelectorAll('.product-card').forEach(c => {
+        c.classList.add('list-view');
+        // show list actions if not already there
+        if (!c.querySelector('.prod-list-actions')) {
+          const det = c.querySelector('.product-details');
+          const actions = document.createElement('div');
+          actions.className = 'prod-list-actions';
+          actions.innerHTML = '<button class="prod-list-atc">Add to Cart</button><button class="prod-list-wish">🤍</button>';
+          det.appendChild(actions);
+        }
+      });
+    } else {
+      grid.classList.remove('list-view');
+      grid.querySelectorAll('.product-card').forEach(c => {
+        c.classList.remove('list-view');
+        const actions = c.querySelector('.prod-list-actions');
+        if (actions) actions.remove();
+      });
+    }
+  }
+
+  // Clear filters
+  function clearFilters() {
+    document.querySelectorAll('.filter-opt.checked').forEach(o => o.classList.remove('checked'));
+    document.querySelectorAll('.filter-color.active').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.filter-size.active').forEach(s => s.classList.remove('active'));
+    document.getElementById('activeFilters').innerHTML = '';
+  }
+
+  // Mobile filters
+  function openMobileFilters() {
+    document.getElementById('mfOverlay').style.display = 'block';
+    document.getElementById('mfPanel').classList.add('open');
+  }
+  function closeMobileFilters() {
+    document.getElementById('mfOverlay').style.display = 'none';
+    document.getElementById('mfPanel').classList.remove('open');
+  }
+
+  // Animate in cards
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }, i * 50);
+      }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.product-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(14px)';
+    el.style.transition = 'opacity .4s ease, transform .4s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

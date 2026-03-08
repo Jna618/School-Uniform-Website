@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Detail & Fulfillment – Galaxy Uniforms Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1F3C; --navy-mid: #1A3358; --navy-light: #2A4A7A; --navy-pale: #EEF2F8;
+    --gold: #E8A020; --gold-light: #F5C050; --gold-pale: rgba(232,160,32,0.09);
+    --white: #FFFFFF; --sidebar-bg: #0A1828; --sidebar-border: rgba(255,255,255,0.07);
+    --gray-50: #F8F9FA; --gray-100: #F0F2F5; --gray-200: #E4E8ED;
+    --gray-300: #CBD0D8; --gray-400: #9CA3AF; --gray-500: #6B7280; --gray-700: #374151;
+    --red: #E03C31; --red-pale: rgba(224,60,49,0.09);
+    --green: #1A7A4A; --green-pale: rgba(26,122,74,0.09);
+    --blue: #1565C0; --blue-pale: rgba(21,101,192,0.09);
+    --amber: #B45309; --amber-pale: rgba(180,83,9,0.09);
+    --purple: #6D28D9; --purple-pale: rgba(109,40,217,0.08);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg: 0 10px 36px rgba(0,0,0,0.14); --radius: 12px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--gray-100); color: var(--navy); display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { width: 240px; flex-shrink: 0; background: var(--sidebar-bg); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; border-right: 1px solid var(--sidebar-border); }
+  .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .sidebar-logo-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 800; color: white; }
+  .sidebar-logo-sub { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 1.5px; text-transform: uppercase; }
+  .sidebar-section { padding: 16px 12px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.28); }
+  .sidebar-nav { padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,0.55); cursor: pointer; transition: all .18s; text-decoration: none; position: relative; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+  .sidebar-item.active { background: rgba(232,160,32,0.15); color: var(--gold-light); font-weight: 700; }
+  .sidebar-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--gold); border-radius: 0 3px 3px 0; }
+  .sidebar-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+  .sidebar-badge { margin-left: auto; background: var(--red); color: white; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; }
+  .sidebar-badge.amber { background: var(--amber); }
+  .sidebar-divider { border: none; border-top: 1px solid var(--sidebar-border); margin: 8px 12px; }
+  .sidebar-user { padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--sidebar-border); margin-top: auto; }
+  .sidebar-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--navy); font-family: 'Playfair Display', serif; }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+  /* ── MAIN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 24px; height: 62px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm); gap: 16px; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .topbar-back { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--gray-500); cursor: pointer; border: none; background: none; font-family: 'DM Sans', sans-serif; padding: 6px 10px; border-radius: 7px; transition: all .15s; flex-shrink: 0; }
+  .topbar-back:hover { background: var(--gray-100); color: var(--navy); }
+  .topbar-divider { width: 1px; height: 28px; background: var(--gray-200); }
+  .topbar-order-id { font-size: 16px; font-weight: 800; color: var(--navy); }
+  .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .tb-btn { height: 34px; padding: 0 13px; border-radius: 7px; border: 1.5px solid var(--gray-200); background: var(--white); font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--navy); display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap; }
+  .tb-btn:hover { border-color: var(--navy); background: var(--gray-50); }
+  .tb-btn.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .tb-btn.green { background: var(--green); color: white; border-color: var(--green); }
+  .tb-btn.danger { color: var(--red); border-color: rgba(224,60,49,0.3); }
+  .tb-btn.danger:hover { background: var(--red-pale); }
+
+  /* ── BODY ── */
+  .body-wrap { flex: 1; overflow-y: auto; padding: 20px 24px 40px; display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
+
+  /* ── STATUS PIPELINE ── */
+  .pipeline-card { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); padding: 20px 24px; box-shadow: var(--shadow-sm); margin-bottom: 18px; grid-column: span 2; }
+  .pipeline-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .pipeline-title { font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+  .pipeline-meta { font-size: 12px; color: var(--gray-500); }
+  .pipeline { display: flex; align-items: center; gap: 0; }
+  .pipeline-step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; cursor: pointer; }
+  .pipeline-step::after { content: ''; position: absolute; top: 18px; left: 50%; width: 100%; height: 3px; background: var(--gray-200); z-index: 0; }
+  .pipeline-step:last-child::after { display: none; }
+  .pipeline-step.done::after { background: var(--green); }
+  .pipeline-step.active::after { background: linear-gradient(90deg, var(--green), var(--gray-200)); }
+  .step-circle { width: 36px; height: 36px; border-radius: 50%; border: 2.5px solid var(--gray-300); background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; z-index: 1; transition: all .2s; }
+  .pipeline-step.done .step-circle { border-color: var(--green); background: var(--green); }
+  .pipeline-step.active .step-circle { border-color: var(--navy); background: var(--navy); box-shadow: 0 0 0 4px rgba(13,31,60,0.12); }
+  .pipeline-step.blocked .step-circle { border-color: var(--red); background: var(--red-pale); }
+  .step-label { font-size: 11px; font-weight: 700; color: var(--gray-400); text-align: center; line-height: 1.3; }
+  .pipeline-step.done .step-label { color: var(--green); }
+  .pipeline-step.active .step-label { color: var(--navy); }
+  .pipeline-step.blocked .step-label { color: var(--red); }
+  .step-time { font-size: 10px; color: var(--gray-400); text-align: center; }
+  .pipeline-step.active .step-time { color: var(--navy); font-weight: 600; }
+
+  /* ── PANEL ── */
+  .panel { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 18px; }
+  .panel-header { padding: 14px 18px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 7px; }
+  .panel-action { font-size: 12px; font-weight: 700; color: var(--navy); background: var(--gray-100); border: none; padding: 5px 11px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 5px; transition: background .15s; }
+  .panel-action:hover { background: var(--gray-200); }
+  .panel-action.primary { background: var(--navy); color: white; }
+  .panel-body { padding: 16px 18px; }
+  .panel-body.no-pad { padding: 0; }
+
+  /* ── ORDER ITEMS ── */
+  .item-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--gray-100); }
+  .item-row:last-child { border-bottom: none; }
+  .item-thumb { width: 56px; height: 56px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; border: 1px solid var(--gray-200); }
+  .item-info { flex: 1; }
+  .item-name { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .item-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+  .item-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .it-sku { background: var(--navy-pale); color: var(--navy-mid); font-family: monospace; }
+  .it-school { background: var(--green-pale); color: var(--green); }
+  .it-emb { background: var(--gold-pale); color: var(--amber); }
+  .it-child { background: var(--blue-pale); color: var(--blue); }
+  .item-right { text-align: right; flex-shrink: 0; }
+  .item-price { font-size: 14px; font-weight: 800; color: var(--navy); }
+  .item-qty { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+  .item-pick-status { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 5px; margin-top: 6px; cursor: pointer; transition: all .15s; }
+  .ps-pending { background: var(--amber-pale); color: var(--amber); }
+  .ps-picked { background: var(--green-pale); color: var(--green); }
+  .ps-issue { background: var(--red-pale); color: var(--red); }
+
+  /* ── PICK LIST ── */
+  .pick-list { display: flex; flex-direction: column; gap: 0; }
+  .pick-row { display: flex; align-items: center; gap: 10px; padding: 11px 18px; border-bottom: 1px solid var(--gray-100); transition: background .15s; }
+  .pick-row:last-child { border-bottom: none; }
+  .pick-row:hover { background: var(--gray-50); }
+  .pick-checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--gray-300); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+  .pick-checkbox.checked { background: var(--green); border-color: var(--green); }
+  .pick-checkbox.checked::after { content: '✓'; font-size: 11px; color: white; font-weight: 800; }
+  .pick-row.picked .pick-sku { opacity: 0.5; text-decoration: line-through; }
+  .pick-sku { font-family: monospace; font-size: 11px; font-weight: 700; color: var(--navy-mid); background: var(--navy-pale); padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+  .pick-desc { flex: 1; font-size: 12px; color: var(--navy); font-weight: 500; }
+  .pick-loc { font-size: 11px; color: var(--gray-500); display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .pick-loc-badge { background: var(--purple-pale); color: var(--purple); font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+  .pick-qty { font-size: 12px; font-weight: 700; color: var(--navy); flex-shrink: 0; width: 28px; text-align: right; }
+
+  /* ── EMBROIDERY CARD ── */
+  .emb-card { background: linear-gradient(135deg, #FFFBEF, #FFF8E1); border: 1.5px solid var(--gold); border-radius: var(--radius); padding: 16px 18px; }
+  .emb-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .emb-card-icon { font-size: 22px; }
+  .emb-card-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .emb-card-sub { font-size: 12px; color: var(--gray-500); }
+  .emb-detail-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+  .emb-label { color: var(--gray-500); width: 100px; flex-shrink: 0; font-weight: 500; }
+  .emb-val { color: var(--navy); font-weight: 700; }
+  .emb-preview { width: 100%; height: 80px; background: linear-gradient(135deg, #D8E0EE, #C8D0DE); border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 28px; margin: 12px 0; border: 1px solid var(--gray-200); position: relative; }
+  .emb-preview-label { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: 700; color: var(--gray-500); white-space: nowrap; letter-spacing: 0.5px; }
+  .emb-status-row { display: flex; gap: 8px; margin-top: 8px; }
+  .emb-stage { flex: 1; text-align: center; padding: 7px; border-radius: 7px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all .15s; }
+  .emb-stage.done { background: var(--green-pale); color: var(--green); }
+  .emb-stage.active { background: var(--navy); color: white; }
+  .emb-stage.pending { background: var(--gray-100); color: var(--gray-400); }
+
+  /* ── SHIPPING ── */
+  .carrier-select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .carrier-btn { border: 1.5px solid var(--gray-200); border-radius: 8px; padding: 10px 8px; text-align: center; cursor: pointer; transition: all .15s; background: white; }
+  .carrier-btn:hover { border-color: var(--navy); }
+  .carrier-btn.selected { border-color: var(--navy); background: var(--navy-pale); }
+  .carrier-name { font-size: 11px; font-weight: 800; color: var(--navy); }
+  .carrier-price { font-size: 13px; font-weight: 700; color: var(--navy); margin-top: 3px; }
+  .carrier-eta { font-size: 10px; color: var(--gray-500); margin-top: 1px; }
+  .carrier-badge { font-size: 9px; background: var(--green-pale); color: var(--green); font-weight: 700; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-top: 3px; }
+  .label-preview { background: var(--gray-50); border: 1.5px dashed var(--gray-300); border-radius: 8px; padding: 16px; text-align: center; }
+  .label-preview-icon { font-size: 32px; margin-bottom: 6px; }
+  .label-preview-text { font-size: 12px; color: var(--gray-500); }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; padding: 4px 0; }
+  .timeline-item { display: flex; gap: 14px; padding: 10px 18px; position: relative; }
+  .timeline-item:not(:last-child)::before { content: ''; position: absolute; left: 29px; top: 32px; bottom: -4px; width: 2px; background: var(--gray-200); }
+  .timeline-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: 2px; }
+  .td-green { background: var(--green-pale); border: 2px solid var(--green); }
+  .td-blue { background: var(--blue-pale); border: 2px solid var(--blue); }
+  .td-amber { background: var(--amber-pale); border: 2px solid var(--amber); }
+  .td-navy { background: var(--navy-pale); border: 2px solid var(--navy); }
+  .td-gray { background: var(--gray-100); border: 2px solid var(--gray-300); }
+  .timeline-content { flex: 1; }
+  .timeline-action { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+  .timeline-detail { font-size: 11px; color: var(--gray-500); line-height: 1.5; }
+  .timeline-time { font-size: 10px; color: var(--gray-400); flex-shrink: 0; margin-top: 3px; }
+
+  /* ── CUSTOMER CARD ── */
+  .customer-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .customer-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: var(--navy); font-family: 'Playfair Display', serif; flex-shrink: 0; }
+  .customer-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .customer-meta { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+  .customer-stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .customer-stat { background: var(--gray-50); border-radius: 8px; padding: 10px 12px; }
+  .cstat-val { font-size: 16px; font-weight: 800; color: var(--navy); }
+  .cstat-label { font-size: 10px; color: var(--gray-500); margin-top: 2px; }
+  .address-block { background: var(--gray-50); border-radius: 8px; padding: 12px; font-size: 12px; color: var(--navy); line-height: 1.7; border: 1px solid var(--gray-200); }
+
+  /* ── FINANCIALS ── */
+  .fin-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--gray-100); }
+  .fin-row:last-child { border-bottom: none; }
+  .fin-label { color: var(--gray-600); }
+  .fin-val { font-weight: 600; color: var(--navy); }
+  .fin-row.total .fin-label { font-weight: 800; font-size: 15px; color: var(--navy); }
+  .fin-row.total .fin-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; }
+  .fin-row.savings .fin-val { color: var(--green); }
+  .fin-row.profit .fin-val { color: var(--green); font-weight: 700; }
+  .fin-margin { display: inline-block; background: var(--green-pale); color: var(--green); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+
+  /* ── STATUS PILLS ── */
+  .status-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+  .sp-emb { background: var(--gold-pale); color: var(--amber); border: 1px solid rgba(232,160,32,0.3); }
+  .sp-processing { background: var(--amber-pale); color: var(--amber); }
+  .sp-new { background: var(--blue-pale); color: var(--blue); }
+  .sp-shipped { background: var(--purple-pale); color: var(--purple); }
+  .sp-delivered { background: var(--green-pale); color: var(--green); }
+
+  /* ── NOTE BOX ── */
+  .note-box { width: 100%; padding: 10px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; resize: vertical; min-height: 64px; }
+  .note-box:focus { border-color: var(--navy); }
+  .note-entry { background: var(--gray-50); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 12px; color: var(--gray-700); line-height: 1.5; }
+  .note-entry-meta { font-size: 10px; color: var(--gray-400); margin-top: 4px; }
+
+  /* ── ISSUE BANNER ── */
+  .issue-banner { background: var(--red-pale); border: 1.5px solid rgba(224,60,49,0.3); border-radius: 10px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+  .issue-icon { font-size: 18px; flex-shrink: 0; }
+  .issue-text { font-size: 12px; color: var(--navy); flex: 1; line-height: 1.5; }
+  .issue-resolve { font-size: 11px; font-weight: 700; color: var(--red); background: none; border: 1.5px solid rgba(224,60,49,0.4); padding: 4px 10px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
+
+  /* toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 999; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; transform: translateY(60px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 16px; padding: 28px; max-width: 440px; width: 90%; box-shadow: var(--shadow-lg); }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+  .modal-sub { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-btn { flex: 1; padding: 12px; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; border: none; transition: all .15s; }
+  .modal-btn.cancel { background: var(--gray-100); color: var(--navy); }
+  .modal-btn.confirm { background: var(--green); color: white; }
+  .modal-btn.danger { background: var(--red); color: white; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .pipeline-card, .panel { animation: fadeUp .35s ease both; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;"><circle cx="12" cy="12" r="3" fill="#0D1F3C"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#0D1F3C" stroke-width="1.5" fill="none"/></svg>
+    </div>
+    <div><div class="sidebar-logo-name">Galaxy</div><div class="sidebar-logo-sub">Admin Panel</div></div>
+  </div>
+  <div class="sidebar-section">Overview</div>
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-admin.html" class="sidebar-item"><span class="sidebar-icon">📊</span> Dashboard</a>
+    <a href="galaxy-uniforms-order-detail.html" class="sidebar-item active"><span class="sidebar-icon">📦</span> Orders <span class="sidebar-badge">14</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🧵</span> Embroidery Queue <span class="sidebar-badge">8</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📋</span> Fulfillment <span class="sidebar-badge">23</span></a>
+  </div>
+  <div class="sidebar-section">Catalog</div>
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-sku-manager.html" class="sidebar-item"><span class="sidebar-icon">👕</span> Products & SKUs</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📦</span> Inventory <span class="sidebar-badge amber">3</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🏷️</span> Pricing & Discounts</a>
+  </div>
+  <div class="sidebar-section">Schools & B2B</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🏫</span> Partner Schools</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🛍️</span> School Storefronts</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📝</span> Proposals & Quotes</a>
+  </div>
+  <div class="sidebar-section">Customers</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">👤</span> Customer Accounts</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">⭐</span> Galaxy Rewards</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">💬</span> Customer Service <span class="sidebar-badge">5</span></a>
+  </div>
+  <hr class="sidebar-divider">
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-analytics.html" class="sidebar-item"><span class="sidebar-icon">📈</span> Reports & Analytics</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">⚙️</span> Settings</a>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">JG</div>
+    <div><div class="sidebar-user-name">James G.</div><div class="sidebar-user-role">Owner / Admin</div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back" onclick="showToast('Back to orders list...')">← Orders</button>
+      <div class="topbar-divider"></div>
+      <div class="topbar-order-id">#GU-20249102</div>
+      <span class="status-pill sp-emb">🧵 Awaiting Embroidery</span>
+      <span style="font-size:12px;color:var(--gray-400);">Mar 5, 2026 · 9:14 AM</span>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn" onclick="showToast('Printing packing slip...')">🖨 Print Slip</button>
+      <button class="tb-btn" onclick="showToast('Printing pick list...')">📋 Pick List</button>
+      <button class="tb-btn" onclick="document.getElementById('refundModal').classList.add('open')">↩ Refund</button>
+      <button class="tb-btn danger" onclick="document.getElementById('cancelModal').classList.add('open')">✕ Cancel</button>
+      <button class="tb-btn green" onclick="advanceStage()">▶ Advance Stage</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body-wrap">
+
+    <!-- FULFILLMENT PIPELINE — full width -->
+    <div class="pipeline-card">
+      <div class="pipeline-top">
+        <div class="pipeline-title">⚡ Fulfillment Pipeline</div>
+        <div class="pipeline-meta">Order placed 9:14 AM · SLA: Ship by 5:00 PM today · <span style="color:var(--amber);font-weight:700;">4h 46m remaining</span></div>
+      </div>
+      <div class="pipeline">
+        <div class="pipeline-step done" onclick="showToast('Order placed Mar 5, 9:14 AM')">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Order<br>Received</div>
+          <div class="step-time">9:14 AM</div>
+        </div>
+        <div class="pipeline-step done" onclick="showToast('Payment confirmed at 9:15 AM')">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Payment<br>Confirmed</div>
+          <div class="step-time">9:15 AM</div>
+        </div>
+        <div class="pipeline-step done" onclick="showToast('Items picked at 10:02 AM')">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Picked &<br>Staged</div>
+          <div class="step-time">10:02 AM</div>
+        </div>
+        <div class="pipeline-step active" id="embStep" onclick="showToast('Embroidery in progress — current stage')">
+          <div class="step-circle">🧵</div>
+          <div class="step-label">Embroidery<br>In Progress</div>
+          <div class="step-time">In progress</div>
+        </div>
+        <div class="pipeline-step" id="qcStep" onclick="showToast('QC check pending')">
+          <div class="step-circle">🔍</div>
+          <div class="step-label">QC<br>Check</div>
+          <div class="step-time">—</div>
+        </div>
+        <div class="pipeline-step" id="packStep" onclick="showToast('Packing pending')">
+          <div class="step-circle">📦</div>
+          <div class="step-label">Packed &<br>Labeled</div>
+          <div class="step-time">—</div>
+        </div>
+        <div class="pipeline-step" id="shipStep" onclick="showToast('Shipping pending')">
+          <div class="step-circle">✈</div>
+          <div class="step-label">Shipped</div>
+          <div class="step-time">—</div>
+        </div>
+        <div class="pipeline-step" id="delivStep" onclick="showToast('Delivery pending')">
+          <div class="step-circle">🏠</div>
+          <div class="step-label">Delivered</div>
+          <div class="step-time">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+      <!-- ORDER ITEMS -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🛒 Order Items <span style="background:var(--navy);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:4px;">7 items</span></div>
+          <button class="panel-action" onclick="showToast('Editing order items...')">✏️ Edit Items</button>
+        </div>
+
+        <div class="item-row">
+          <div class="item-thumb" style="background:linear-gradient(135deg,#D0D8EC,#BEC8DC);">👕</div>
+          <div class="item-info">
+            <div class="item-name">Classic Piqué Polo</div>
+            <div class="item-tags">
+              <span class="item-tag it-sku">CP-NVY-10-REG</span>
+              <span class="item-tag it-school">✓ St. Mary's</span>
+              <span class="item-tag it-emb">🧵 Embroidery</span>
+              <span class="item-tag it-child">👦 Marcus</span>
+            </div>
+            <div style="font-size:11px;color:var(--gray-500);">Navy · Size 10 · Regular · Left chest logo</div>
+            <div class="item-pick-status ps-picked" onclick="this.classList.toggle('ps-picked');this.classList.toggle('ps-pending');this.textContent=this.classList.contains('ps-picked')?'✓ Picked':'○ Pending'">✓ Picked</div>
+          </div>
+          <div class="item-right">
+            <div class="item-price">$40.47</div>
+            <div class="item-qty">×3 @ $13.49</div>
+          </div>
+        </div>
+
+        <div class="item-row">
+          <div class="item-thumb" style="background:linear-gradient(135deg,#EDE8DC,#E0D8C8);">👖</div>
+          <div class="item-info">
+            <div class="item-name">Adjustable Waist Twill Pants</div>
+            <div class="item-tags">
+              <span class="item-tag it-sku">TP-KHK-10S-SLM</span>
+              <span class="item-tag it-school">✓ St. Mary's</span>
+              <span class="item-tag it-child">👦 Marcus</span>
+            </div>
+            <div style="font-size:11px;color:var(--gray-500);">Khaki · Size 10 Slim</div>
+            <div class="item-pick-status ps-picked" onclick="this.classList.toggle('ps-picked');this.classList.toggle('ps-pending');this.textContent=this.classList.contains('ps-picked')?'✓ Picked':'○ Pending'">✓ Picked</div>
+          </div>
+          <div class="item-right">
+            <div class="item-price">$14.99</div>
+            <div class="item-qty">×1</div>
+          </div>
+        </div>
+
+        <div class="item-row">
+          <div class="item-thumb" style="background:linear-gradient(135deg,#EEE8F4,#E4DCF0);">👚</div>
+          <div class="item-info">
+            <div class="item-name">Stretch Blend Blouse — Wrinkle-Resistant</div>
+            <div class="item-tags">
+              <span class="item-tag it-sku">SBB-WHT-12-REG</span>
+              <span class="item-tag it-school">✓ St. Mary's</span>
+              <span class="item-tag it-child">👧 Sofia</span>
+            </div>
+            <div style="font-size:11px;color:var(--gray-500);">White · Size 12 · Regular</div>
+            <div class="item-pick-status ps-picked" onclick="this.classList.toggle('ps-picked');this.classList.toggle('ps-pending');this.textContent=this.classList.contains('ps-picked')?'✓ Picked':'○ Pending'">✓ Picked</div>
+          </div>
+          <div class="item-right">
+            <div class="item-price">$33.98</div>
+            <div class="item-qty">×2 @ $16.99</div>
+          </div>
+        </div>
+
+        <div class="item-row">
+          <div class="item-thumb" style="background:linear-gradient(135deg,#F0E4EC,#E4D4E0);">🥻</div>
+          <div class="item-info">
+            <div class="item-name">Plaid Box Pleat Jumper</div>
+            <div class="item-tags">
+              <span class="item-tag it-sku">PBJ-NVP-12</span>
+              <span class="item-tag it-school">✓ St. Mary's</span>
+              <span class="item-tag it-child">👧 Sofia</span>
+            </div>
+            <div style="font-size:11px;color:var(--gray-500);">Navy Plaid · Size 12</div>
+            <div class="item-pick-status ps-picked" onclick="this.classList.toggle('ps-picked');this.classList.toggle('ps-pending');this.textContent=this.classList.contains('ps-picked')?'✓ Picked':'○ Pending'">✓ Picked</div>
+          </div>
+          <div class="item-right">
+            <div class="item-price">$18.99</div>
+            <div class="item-qty">×1</div>
+          </div>
+        </div>
+
+        <div class="item-row">
+          <div class="item-thumb" style="background:linear-gradient(135deg,#EFEFEF,#E2E2E2);">👕</div>
+          <div class="item-info">
+            <div class="item-name">Classic Piqué Polo</div>
+            <div class="item-tags">
+              <span class="item-tag it-sku">CP-WHT-06-REG</span>
+              <span class="item-tag it-school">✓ St. Mary's</span>
+              <span class="item-tag it-child">👦 Leo</span>
+            </div>
+            <div style="font-size:11px;color:var(--gray-500);">White · Size 6 · Regular</div>
+            <div class="item-pick-status ps-issue" id="leoPickStatus" onclick="togglePickIssue(this)">⚠ Stock Issue</div>
+          </div>
+          <div class="item-right">
+            <div class="item-price">$29.98</div>
+            <div class="item-qty">×2 @ $14.99</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PICK LIST -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📋 Warehouse Pick List</div>
+          <div style="display:flex;gap:8px;">
+            <span style="font-size:12px;color:var(--green);font-weight:700;" id="pickProgress">6/7 picked</span>
+            <button class="panel-action" onclick="markAllPicked()">✓ Mark All</button>
+          </div>
+        </div>
+        <div class="pick-list" id="pickList">
+
+          <div class="pick-row picked">
+            <div class="pick-checkbox checked" onclick="togglePick(this)"></div>
+            <span class="pick-sku">CP-NVY-10-REG</span>
+            <span class="pick-desc">Classic Polo · Navy · Sz 10 · Regular</span>
+            <span class="pick-loc"><span class="pick-loc-badge">A4-12</span></span>
+            <span class="pick-qty">×3</span>
+          </div>
+
+          <div class="pick-row picked">
+            <div class="pick-checkbox checked" onclick="togglePick(this)"></div>
+            <span class="pick-sku">TP-KHK-10S-SLM</span>
+            <span class="pick-desc">Twill Pants · Khaki · Sz 10S · Slim</span>
+            <span class="pick-loc"><span class="pick-loc-badge">B2-07</span></span>
+            <span class="pick-qty">×1</span>
+          </div>
+
+          <div class="pick-row picked">
+            <div class="pick-checkbox checked" onclick="togglePick(this)"></div>
+            <span class="pick-sku">SBB-WHT-12-REG</span>
+            <span class="pick-desc">Stretch Blouse · White · Sz 12</span>
+            <span class="pick-loc"><span class="pick-loc-badge">C1-03</span></span>
+            <span class="pick-qty">×2</span>
+          </div>
+
+          <div class="pick-row picked">
+            <div class="pick-checkbox checked" onclick="togglePick(this)"></div>
+            <span class="pick-sku">PBJ-NVP-12</span>
+            <span class="pick-desc">Plaid Jumper · Navy Plaid · Sz 12</span>
+            <span class="pick-loc"><span class="pick-loc-badge">C3-15</span></span>
+            <span class="pick-qty">×1</span>
+          </div>
+
+          <div class="pick-row" id="lastPickRow">
+            <div class="pick-checkbox" onclick="togglePick(this)" id="lastPickCheck"></div>
+            <span class="pick-sku">CP-WHT-06-REG</span>
+            <span class="pick-desc" style="color:var(--red);font-weight:600;">Classic Polo · White · Sz 6 — ⚠ Only 0 in stock</span>
+            <span class="pick-loc"><span class="pick-loc-badge" style="background:var(--red-pale);color:var(--red);">OOS</span></span>
+            <span class="pick-qty">×2</span>
+          </div>
+
+        </div>
+        <div style="padding:12px 18px;background:var(--red-pale);border-top:1px solid rgba(224,60,49,0.2);">
+          <div class="issue-banner" style="margin-bottom:0;">
+            <div class="issue-icon">⚠️</div>
+            <div class="issue-text"><strong>Stock issue: CP-WHT-06-REG</strong> — 0 units in stock, 2 needed. Options: <strong>Substitute</strong> with CP-WHT-06-SLM (18 in stock), <strong>Backorder</strong> (ETA Mar 12), or <strong>Contact customer</strong>.</div>
+            <button class="issue-resolve" onclick="document.getElementById('substituteModal').classList.add('open')">Resolve →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMBROIDERY -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🧵 Embroidery Details</div>
+          <span class="status-pill sp-emb">In Progress</span>
+        </div>
+        <div class="panel-body">
+          <div class="emb-card">
+            <div class="emb-card-header">
+              <div class="emb-card-icon">🧵</div>
+              <div>
+                <div class="emb-card-title">St. Mary's Academy Crest</div>
+                <div class="emb-card-sub">Code: EMB-SMA-001 · 3 garments</div>
+              </div>
+            </div>
+            <div class="emb-detail-row"><span class="emb-label">Garment</span><span class="emb-val">Classic Piqué Polo · Navy ×3</span></div>
+            <div class="emb-detail-row"><span class="emb-label">Position</span><span class="emb-val">Left Chest</span></div>
+            <div class="emb-detail-row"><span class="emb-label">Thread colors</span><span class="emb-val">Gold (PMS 130C) · White</span></div>
+            <div class="emb-detail-row"><span class="emb-label">Stitch count</span><span class="emb-val">8,400 stitches</span></div>
+            <div class="emb-detail-row"><span class="emb-label">Est. time</span><span class="emb-val">~18 min per piece</span></div>
+            <div class="emb-preview">
+              <span>👕</span>
+              <span style="font-size:14px;">⭐</span>
+              <div class="emb-preview-label">LEFT CHEST POSITION PREVIEW</div>
+            </div>
+            <div class="emb-status-row">
+              <div class="emb-stage done" onclick="showToast('Digitizing complete')">✓ Digitized</div>
+              <div class="emb-stage done" onclick="showToast('Hooped — garments on machine')">✓ Hooped</div>
+              <div class="emb-stage active" onclick="showToast('Currently stitching — piece 2 of 3')">⚡ Stitching</div>
+              <div class="emb-stage pending" onclick="showToast('QC not started')">QC Review</div>
+              <div class="emb-stage pending" onclick="showToast('Not complete')">Complete</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHIPPING -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">✈ Shipping</div>
+          <button class="panel-action primary" onclick="showToast('Generating shipping label...')">📦 Generate Label</button>
+        </div>
+        <div class="panel-body">
+          <div style="font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Select Carrier & Service</div>
+          <div class="carrier-select">
+            <div class="carrier-btn selected" onclick="selectCarrier(this)">
+              <div class="carrier-name">USPS</div>
+              <div class="carrier-price">$7.40</div>
+              <div class="carrier-eta">2–3 business days</div>
+              <div class="carrier-badge">Recommended</div>
+            </div>
+            <div class="carrier-btn" onclick="selectCarrier(this)">
+              <div class="carrier-name">UPS Ground</div>
+              <div class="carrier-price">$9.18</div>
+              <div class="carrier-eta">2–5 business days</div>
+            </div>
+            <div class="carrier-btn" onclick="selectCarrier(this)">
+              <div class="carrier-name">FedEx 2Day</div>
+              <div class="carrier-price">$16.90</div>
+              <div class="carrier-eta">2 business days</div>
+            </div>
+          </div>
+          <div class="label-preview">
+            <div class="label-preview-icon">🏷️</div>
+            <div class="label-preview-text">Label ready to generate · USPS Priority Mail<br><span style="font-size:10px;color:var(--gray-400);">Click "Generate Label" to print</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left col -->
+
+    <!-- RIGHT COLUMN -->
+    <div>
+
+      <!-- CUSTOMER -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">👤 Customer</div>
+          <button class="panel-action" onclick="showToast('Opening customer profile...')">View Profile →</button>
+        </div>
+        <div class="panel-body">
+          <div class="customer-row">
+            <div class="customer-avatar">JT</div>
+            <div>
+              <div class="customer-name">Jennifer Torres</div>
+              <div class="customer-meta"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="056f2b716a77776076456068646c692b666a68">[email&#160;protected]</a> · (201) 555-0142</div>
+            </div>
+          </div>
+          <div class="customer-stat-row">
+            <div class="customer-stat"><div class="cstat-val">12</div><div class="cstat-label">Lifetime Orders</div></div>
+            <div class="customer-stat"><div class="cstat-val">$1,082</div><div class="cstat-label">Lifetime Value</div></div>
+            <div class="customer-stat"><div class="cstat-val">Gold</div><div class="cstat-label">Rewards Tier</div></div>
+            <div class="customer-stat"><div class="cstat-val">840 pts</div><div class="cstat-label">Points Balance</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Ship To</div>
+          <div class="address-block">
+            <strong>Jennifer Torres</strong><br>
+            142 Oak Avenue<br>
+            Newark, NJ 07102<br>
+            United States
+          </div>
+          <div style="display:flex;gap:7px;margin-top:10px;">
+            <button class="panel-action" style="flex:1;justify-content:center;" onclick="showToast('Emailing customer...')">✉ Email</button>
+            <button class="panel-action" style="flex:1;justify-content:center;" onclick="showToast('Opening SMS...')">💬 SMS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER FINANCIALS -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">💰 Financials</div>
+        </div>
+        <div class="panel-body">
+          <div class="fin-row"><span class="fin-label">Subtotal (7 items)</span><span class="fin-val">$138.41</span></div>
+          <div class="fin-row savings"><span class="fin-label">Volume discount</span><span class="fin-val">−$4.50</span></div>
+          <div class="fin-row"><span class="fin-label">Embroidery (3 items)</span><span class="fin-val">$20.97</span></div>
+          <div class="fin-row"><span class="fin-label">Shipping (USPS)</span><span class="fin-val">$7.40</span></div>
+          <div class="fin-row"><span class="fin-label">Tax (NJ 6.625%)</span><span class="fin-val">$10.70</span></div>
+          <div class="fin-row savings"><span class="fin-label">Rewards redeemed</span><span class="fin-val">−$8.40</span></div>
+          <div class="fin-row total"><span class="fin-label">Total Charged</span><span class="fin-val">$164.58</span></div>
+          <hr style="border:none;border-top:1px dashed var(--gray-200);margin:12px 0;">
+          <div class="fin-row"><span class="fin-label" style="font-size:11px;">COGS estimate</span><span class="fin-val" style="font-size:12px;">$53.60</span></div>
+          <div class="fin-row profit"><span class="fin-label" style="font-size:11px;">Est. Profit</span><span class="fin-val" style="font-size:13px;">$110.98 <span class="fin-margin">67.4%</span></span></div>
+          <div style="display:flex;gap:6px;margin-top:12px;">
+            <button class="panel-action primary" style="flex:1;justify-content:center;" onclick="document.getElementById('refundModal').classList.add('open')">↩ Refund</button>
+            <button class="panel-action" style="flex:1;justify-content:center;" onclick="showToast('Viewing payment details...')">💳 Payment</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER NOTES -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📝 Order Notes</div>
+          <button class="panel-action" onclick="addNote()">+ Add Note</button>
+        </div>
+        <div class="panel-body">
+          <div class="note-entry">
+            <strong>Customer note:</strong> "Please make sure the embroidery matches the school's gold color exactly — my daughter had issues with last year's order from another supplier."
+            <div class="note-entry-meta">Left by customer · Mar 5, 9:14 AM</div>
+          </div>
+          <div class="note-entry" id="internalNotes">
+            <strong>Internal:</strong> Confirmed EMB-SMA-001 uses PMS 130C Gold thread. Matches school spec on file. ✓
+            <div class="note-entry-meta">James G. · Mar 5, 10:15 AM</div>
+          </div>
+          <textarea class="note-box" id="noteInput" placeholder="Add internal note…"></textarea>
+          <button style="margin-top:7px;width:100%;background:var(--navy);color:white;border:none;padding:9px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="addNote()">Add Note</button>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🕐 Order Timeline</div>
+        </div>
+        <div class="panel-body no-pad">
+          <div class="timeline" id="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot td-blue">📦</div>
+              <div class="timeline-content">
+                <div class="timeline-action">Order placed</div>
+                <div class="timeline-detail">Jennifer Torres · 7 items · $164.58 · Visa ···· 4291</div>
+              </div>
+              <div class="timeline-time">9:14 AM</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot td-green">💳</div>
+              <div class="timeline-content">
+                <div class="timeline-action">Payment confirmed</div>
+                <div class="timeline-detail">Visa ···· 4291 · $164.58 · Auth: 8X4K21</div>
+              </div>
+              <div class="timeline-time">9:15 AM</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot td-navy">📋</div>
+              <div class="timeline-content">
+                <div class="timeline-action">Pick list generated</div>
+                <div class="timeline-detail">7 SKUs · Assigned to warehouse</div>
+              </div>
+              <div class="timeline-time">9:16 AM</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot td-green">✓</div>
+              <div class="timeline-content">
+                <div class="timeline-action">6/7 items picked</div>
+                <div class="timeline-detail">CP-WHT-06-REG flagged — 0 in stock</div>
+              </div>
+              <div class="timeline-time">10:02 AM</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot td-amber">🧵</div>
+              <div class="timeline-content">
+                <div class="timeline-action">Embroidery started</div>
+                <div class="timeline-detail">3× Classic Polo Navy · EMB-SMA-001 · Machine 2</div>
+              </div>
+              <div class="timeline-time">10:18 AM</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot td-gray">⏳</div>
+              <div class="timeline-content">
+                <div class="timeline-action" style="color:var(--gray-400);">QC Check — pending</div>
+                <div class="timeline-detail" style="color:var(--gray-400);">Awaiting embroidery completion</div>
+              </div>
+              <div class="timeline-time" style="color:var(--gray-400);">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right col -->
+
+  </div><!-- /body-wrap -->
+</div><!-- /main -->
+
+<!-- MODALS -->
+
+<!-- Refund Modal -->
+<div class="modal-overlay" id="refundModal">
+  <div class="modal">
+    <div class="modal-title">Issue Refund</div>
+    <div class="modal-sub">Refund all or part of order #GU-20249102. The customer will be notified by email.</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button style="flex:1;padding:8px;border:1.5px solid var(--gray-200);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;background:white;font-family:'DM Sans',sans-serif;" onclick="showToast('Full refund selected')">Full — $164.58</button>
+      <button style="flex:1;padding:8px;border:1.5px solid var(--navy);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;background:var(--navy-pale);font-family:'DM Sans',sans-serif;color:var(--navy);" onclick="showToast('Partial refund selected')">Partial amount</button>
+    </div>
+    <textarea class="note-box" placeholder="Reason for refund…" style="margin-bottom:4px;"></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="document.getElementById('refundModal').classList.remove('open')">Cancel</button>
+      <button class="modal-btn confirm" onclick="document.getElementById('refundModal').classList.remove('open');showToast('Refund processed ✓')">Issue Refund</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal">
+    <div class="modal-title">Cancel Order?</div>
+    <div class="modal-sub">This will cancel order #GU-20249102 and release all inventory. The customer will receive an email confirmation and a full refund of $164.58.</div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="document.getElementById('cancelModal').classList.remove('open')">Keep Order</button>
+      <button class="modal-btn danger" onclick="document.getElementById('cancelModal').classList.remove('open');showToast('Order cancelled. Refund issued.')">Cancel & Refund</button>
+    </div>
+  </div>
+</div>
+
+<!-- Substitute Modal -->
+<div class="modal-overlay" id="substituteModal">
+  <div class="modal">
+    <div class="modal-title">Resolve Stock Issue</div>
+    <div class="modal-sub">CP-WHT-06-REG (Classic Polo White Sz 6) is out of stock. Choose a resolution:</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
+      <button style="padding:12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:white;font-family:'DM Sans',sans-serif;text-align:left;" onclick="document.getElementById('substituteModal').classList.remove('open');showToast('Substituting with Slim fit — contacting customer ✓')">🔄 Substitute with Sz 6 Slim (18 in stock) · Contact customer</button>
+      <button style="padding:12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:white;font-family:'DM Sans',sans-serif;text-align:left;" onclick="document.getElementById('substituteModal').classList.remove('open');showToast('Backordered — restocking ETA Mar 12')">📅 Backorder — restock ETA Mar 12, ship when available</button>
+      <button style="padding:12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:white;font-family:'DM Sans',sans-serif;text-align:left;" onclick="document.getElementById('substituteModal').classList.remove('open');showToast('Partial shipment — emailing customer')">📦 Ship partial order now, fulfill remaining later</button>
+      <button style="padding:12px;border:1.5px solid var(--red-pale);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:white;font-family:'DM Sans',sans-serif;text-align:left;color:var(--red);" onclick="document.getElementById('substituteModal').classList.remove('open');showToast('Refunding 2× CP-WHT-06-REG — $29.98')">↩ Refund 2× item — $29.98</button>
+    </div>
+    <button class="modal-btn cancel" onclick="document.getElementById('substituteModal').classList.remove('open')">Cancel</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span>✓</span><span id="toastMsg">Done!</span></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  let stageIndex = 3; // 0=received, 1=payment, 2=picked, 3=embroidery(active), 4=qc, 5=pack, 6=ship, 7=delivered
+  const stageIds = ['embStep','qcStep','packStep','shipStep','delivStep'];
+  const stageTimes = ['In progress','~11:30 AM','~12:00 PM','~1:00 PM','Mar 7'];
+
+  function advanceStage() {
+    if (stageIndex >= 7) { showToast('Order already delivered!'); return; }
+    // Mark current active as done
+    const stagesAll = document.querySelectorAll('.pipeline-step');
+    stagesAll[stageIndex].classList.remove('active');
+    stagesAll[stageIndex].classList.add('done');
+    stagesAll[stageIndex].querySelector('.step-circle').textContent = '✓';
+    stagesAll[stageIndex].querySelector('.step-time').textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+    stageIndex++;
+    if (stageIndex < stagesAll.length) {
+      stagesAll[stageIndex].classList.add('active');
+      const labels = ['🧵','🔍','📦','✈','🏠'];
+      const activeCircle = stagesAll[stageIndex].querySelector('.step-circle');
+      activeCircle.textContent = labels[stageIndex - 3] || '⚡';
+      stagesAll[stageIndex].querySelector('.step-time').textContent = 'In progress';
+    }
+
+    const stageNames = ['Embroidery','QC Check','Packing','Shipped','Delivered'];
+    showToast('Stage advanced: ' + (stageNames[stageIndex - 3] || 'Complete') + ' ✓');
+
+    // Add to timeline
+    const timeline = document.getElementById('timeline');
+    const tnames = ['QC check started','Items packed & labeled','Shipped — tracking generated','Order delivered'];
+    if (stageIndex - 3 >= 0 && stageIndex - 3 < tnames.length) {
+      const item = document.createElement('div');
+      item.className = 'timeline-item';
+      item.style.opacity = '0';
+      item.innerHTML = `<div class="timeline-dot td-green">✓</div><div class="timeline-content"><div class="timeline-action">${tnames[stageIndex-4] || tnames[tnames.length-1]}</div><div class="timeline-detail">Advanced by James G.</div></div><div class="timeline-time">just now</div>`;
+      const placeholder = timeline.lastElementChild;
+      timeline.insertBefore(item, placeholder);
+      setTimeout(() => item.style.opacity = '1', 50);
+    }
+  }
+
+  function togglePick(checkbox) {
+    checkbox.classList.toggle('checked');
+    const row = checkbox.closest('.pick-row');
+    row.classList.toggle('picked');
+    updatePickProgress();
+  }
+
+  function markAllPicked() {
+    document.querySelectorAll('.pick-checkbox').forEach(cb => { cb.classList.add('checked'); cb.closest('.pick-row').classList.add('picked'); });
+    updatePickProgress();
+    showToast('All items marked as picked ✓');
+  }
+
+  function updatePickProgress() {
+    const total = document.querySelectorAll('.pick-checkbox').length;
+    const picked = document.querySelectorAll('.pick-checkbox.checked').length;
+    document.getElementById('pickProgress').textContent = picked + '/' + total + ' picked';
+  }
+
+  function togglePickIssue(el) {
+    if (el.classList.contains('ps-issue')) {
+      document.getElementById('substituteModal').classList.add('open');
+    }
+  }
+
+  function selectCarrier(btn) {
+    document.querySelectorAll('.carrier-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    showToast(btn.querySelector('.carrier-name').textContent + ' selected');
+  }
+
+  function addNote() {
+    const input = document.getElementById('noteInput');
+    const val = input.value.trim();
+    if (!val) { showToast('Please enter a note'); return; }
+    const notes = document.getElementById('internalNotes');
+    const newNote = document.createElement('div');
+    newNote.className = 'note-entry';
+    newNote.style.background = 'rgba(13,31,60,0.04)';
+    newNote.innerHTML = `<strong>Internal:</strong> ${val}<div class="note-entry-meta">James G. · just now</div>`;
+    notes.parentNode.insertBefore(newNote, input);
+    input.value = '';
+    showToast('Note added ✓');
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Close mod

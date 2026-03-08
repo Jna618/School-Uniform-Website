@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product & SKU Manager – Galaxy Uniforms Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1F3C; --navy-mid: #1A3358; --navy-light: #2A4A7A; --navy-pale: #EEF2F8;
+    --gold: #E8A020; --gold-light: #F5C050; --gold-pale: rgba(232,160,32,0.10);
+    --white: #FFFFFF; --sidebar-bg: #0A1828; --sidebar-border: rgba(255,255,255,0.07);
+    --gray-50: #F8F9FA; --gray-100: #F0F2F5; --gray-200: #E4E8ED;
+    --gray-300: #CBD0D8; --gray-400: #9CA3AF; --gray-500: #6B7280; --gray-700: #374151;
+    --red: #E03C31; --red-pale: rgba(224,60,49,0.09);
+    --green: #1A7A4A; --green-pale: rgba(26,122,74,0.09);
+    --blue: #1565C0; --blue-pale: rgba(21,101,192,0.09);
+    --amber: #B45309; --amber-pale: rgba(180,83,9,0.09);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg: 0 10px 36px rgba(0,0,0,0.14); --radius: 12px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--gray-100); color: var(--navy); display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── SIDEBAR (same as admin) ── */
+  .sidebar { width: 240px; flex-shrink: 0; background: var(--sidebar-bg); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; border-right: 1px solid var(--sidebar-border); }
+  .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .sidebar-logo-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 800; color: var(--white); }
+  .sidebar-logo-sub { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 1.5px; text-transform: uppercase; }
+  .sidebar-section { padding: 16px 12px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.28); }
+  .sidebar-nav { padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,0.55); cursor: pointer; transition: all .18s; text-decoration: none; position: relative; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+  .sidebar-item.active { background: rgba(232,160,32,0.15); color: var(--gold-light); font-weight: 700; }
+  .sidebar-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--gold); border-radius: 0 3px 3px 0; }
+  .sidebar-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+  .sidebar-badge { margin-left: auto; background: var(--red); color: white; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; }
+  .sidebar-badge.amber { background: var(--amber); }
+  .sidebar-divider { border: none; border-top: 1px solid var(--sidebar-border); margin: 8px 12px; }
+  .sidebar-user { padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--sidebar-border); margin-top: auto; }
+  .sidebar-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--navy); font-family: 'Playfair Display', serif; }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+  /* ── MAIN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 28px; height: 62px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+  .topbar-title { font-size: 18px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-btn { height: 36px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--gray-200); background: var(--white); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--navy); display: flex; align-items: center; gap: 6px; transition: all .15s; }
+  .topbar-btn:hover { border-color: var(--navy); background: var(--gray-50); }
+  .topbar-btn.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .topbar-btn.primary:hover { background: var(--navy-light); }
+  .topbar-btn.gold { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+  .content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+  /* ── TABS ── */
+  .page-tabs { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 28px; display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+  .page-tab { padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--gray-500); cursor: pointer; border-bottom: 2.5px solid transparent; transition: all .15s; white-space: nowrap; }
+  .page-tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+  .page-tab:hover:not(.active) { color: var(--navy); }
+  .tab-count { font-size: 11px; background: var(--gray-100); color: var(--gray-500); padding: 1px 7px; border-radius: 8px; margin-left: 5px; font-weight: 700; }
+  .page-tab.active .tab-count { background: var(--navy-pale); color: var(--navy); }
+
+  /* ── BODY SPLIT VIEW ── */
+  .split-body { flex: 1; display: grid; grid-template-columns: 1fr 420px; overflow: hidden; }
+  .list-pane { overflow-y: auto; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; }
+  .detail-pane { overflow-y: auto; background: var(--white); }
+
+  /* ── LIST TOOLBAR ── */
+  .list-toolbar { padding: 14px 20px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+  .search-box { flex: 1; min-width: 200px; position: relative; }
+  .search-box input { width: 100%; padding: 9px 12px 9px 34px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; background: var(--gray-50); }
+  .search-box input:focus { border-color: var(--navy); background: white; }
+  .search-box-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; pointer-events: none; }
+  .filter-pill { padding: 7px 12px; border: 1.5px solid var(--gray-200); border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; background: white; color: var(--gray-700); transition: all .15s; white-space: nowrap; }
+  .filter-pill.active { border-color: var(--navy); background: var(--navy); color: white; }
+  .filter-pill:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
+  .filter-select { padding: 8px 10px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--navy); background: white; cursor: pointer; outline: none; }
+  .results-label { font-size: 12px; color: var(--gray-500); white-space: nowrap; }
+
+  /* ── PRODUCT LIST ITEMS ── */
+  .product-list { flex: 1; }
+  .product-row { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background .15s; }
+  .product-row:hover { background: var(--gray-50); }
+  .product-row.selected { background: var(--navy-pale); border-left: 3px solid var(--navy); }
+  .product-row.selected { padding-left: 17px; }
+  .prod-thumb { width: 52px; height: 52px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; border: 1px solid var(--gray-200); }
+  .prod-row-info { flex: 1; min-width: 0; }
+  .prod-row-name { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+  .prod-row-meta { font-size: 11px; color: var(--gray-500); display: flex; gap: 8px; flex-wrap: wrap; }
+  .prod-row-meta span { display: flex; align-items: center; gap: 3px; }
+  .prod-row-right { text-align: right; flex-shrink: 0; }
+  .prod-row-price { font-size: 14px; font-weight: 800; color: var(--navy); }
+  .prod-row-skus { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+  .prod-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-active { background: var(--green); }
+  .dot-draft { background: var(--gray-300); }
+  .dot-low { background: var(--amber); }
+  .dot-oos { background: var(--red); }
+
+  /* ── DETAIL PANE ── */
+  .detail-header { padding: 20px 24px 0; border-bottom: 1px solid var(--gray-100); }
+  .detail-breadcrumb { font-size: 11px; color: var(--gray-400); margin-bottom: 10px; }
+  .detail-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .detail-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; color: var(--navy); line-height: 1.2; }
+  .detail-actions { display: flex; gap: 7px; flex-shrink: 0; }
+  .detail-btn { padding: 7px 13px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1.5px solid var(--gray-200); background: white; color: var(--navy); transition: all .15s; }
+  .detail-btn:hover { border-color: var(--navy); background: var(--gray-50); }
+  .detail-btn.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .detail-btn.primary:hover { background: var(--navy-light); }
+  .detail-btn.danger { color: var(--red); border-color: rgba(224,60,49,0.3); }
+  .detail-btn.danger:hover { background: var(--red-pale); }
+  .detail-tabs { display: flex; gap: 0; }
+  .detail-tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; }
+  .detail-tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+  .detail-body { padding: 20px 24px; }
+
+  /* product images strip */
+  .img-strip { display: flex; gap: 8px; margin-bottom: 20px; }
+  .img-thumb { width: 64px; height: 64px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid var(--gray-200); cursor: pointer; transition: border-color .15s; }
+  .img-thumb.active { border-color: var(--navy); }
+  .img-thumb:hover { border-color: var(--navy-light); }
+  .img-add { border: 2px dashed var(--gray-300); cursor: pointer; font-size: 20px; color: var(--gray-400); }
+  .img-add:hover { border-color: var(--navy); color: var(--navy); }
+
+  /* field groups */
+  .field-group { margin-bottom: 18px; }
+  .field-label { font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .field-value { font-size: 14px; color: var(--navy); font-weight: 500; line-height: 1.5; }
+  .field-input { width: 100%; padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; transition: border-color .15s; background: white; }
+  .field-input:focus { border-color: var(--navy); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .field-textarea { width: 100%; padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; resize: vertical; min-height: 72px; transition: border-color .15s; }
+  .field-textarea:focus { border-color: var(--navy); }
+
+  /* status badge */
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+  .sb-active { background: var(--green-pale); color: var(--green); }
+  .sb-draft { background: var(--gray-100); color: var(--gray-500); }
+  .sb-archived { background: var(--red-pale); color: var(--red); }
+
+  /* color swatches */
+  .swatch-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .color-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border: 1.5px solid var(--gray-200); border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--navy); transition: all .15s; }
+  .color-chip.active { border-color: var(--navy); }
+  .color-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); }
+  .color-chip.active .color-dot { outline: 2px solid var(--navy); outline-offset: 1px; }
+
+  /* ── SKU TABLE ── */
+  .sku-section { margin-top: 4px; }
+  .sku-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .sku-section-title { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .sku-add-btn { font-size: 12px; font-weight: 700; color: var(--navy); background: var(--gray-100); border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 4px; }
+  .sku-add-btn:hover { background: var(--gray-200); }
+  .sku-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .sku-table th { background: var(--gray-50); padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+  .sku-table td { padding: 9px 10px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  .sku-table tr:last-child td { border-bottom: none; }
+  .sku-table tr:hover td { background: var(--gray-50); }
+  .sku-code { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; color: var(--navy-mid); background: var(--navy-pale); padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .sku-stock { font-weight: 700; font-size: 13px; }
+  .stock-ok { color: var(--green); }
+  .stock-low { color: var(--amber); }
+  .stock-oos { color: var(--red); }
+  .sku-inline-input { width: 56px; padding: 4px 7px; border: 1.5px solid var(--gray-200); border-radius: 5px; font-size: 12px; font-family: 'DM Sans', sans-serif; text-align: center; outline: none; color: var(--navy); }
+  .sku-inline-input:focus { border-color: var(--navy); }
+  .sku-action { font-size: 11px; color: var(--gray-500); background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 3px 6px; border-radius: 4px; }
+  .sku-action:hover { background: var(--gray-100); color: var(--navy); }
+
+  /* embroidery codes */
+  .emb-codes { display: flex; flex-direction: column; gap: 8px; }
+  .emb-code-row { display: flex; align-items: center; gap: 10px; background: var(--gold-pale); border: 1px solid rgba(232,160,32,0.3); border-radius: 8px; padding: 10px 12px; }
+  .emb-school-name { font-size: 12px; font-weight: 700; color: var(--navy); flex: 1; }
+  .emb-code-val { font-family: monospace; font-size: 12px; color: var(--amber); background: rgba(180,83,9,0.08); padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+  .emb-position { font-size: 11px; color: var(--gray-500); }
+
+  /* pricing tiers */
+  .pricing-tiers { display: flex; flex-direction: column; gap: 6px; }
+  .pricing-tier-row { display: grid; grid-template-columns: 100px 1fr 1fr auto; gap: 8px; align-items: center; }
+  .pricing-tier-label { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+  .tier-save { font-size: 11px; color: var(--green); font-weight: 700; }
+
+  /* school assignment */
+  .school-assign-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+  .school-assign-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1.5px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all .15s; }
+  .school-assign-row:hover { border-color: var(--navy); background: var(--gray-50); }
+  .school-assign-row.assigned { border-color: var(--green); background: var(--green-pale); }
+  .school-check { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--gray-300); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; }
+  .school-assign-row.assigned .school-check { background: var(--green); border-color: var(--green); color: white; font-weight: 700; }
+  .school-assign-name { font-size: 12px; font-weight: 600; color: var(--navy); flex: 1; }
+  .school-assign-color { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  /* toggle switch */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .toggle-sub { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+  .toggle-switch { width: 40px; height: 22px; border-radius: 11px; cursor: pointer; position: relative; transition: background .2s; flex-shrink: 0; }
+  .toggle-switch.on { background: var(--navy); }
+  .toggle-switch.off { background: var(--gray-300); }
+  .toggle-switch::after { content: ''; position: absolute; top: 3px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: transform .2s; }
+  .toggle-switch.on::after { transform: translateX(21px); }
+  .toggle-switch.off::after { transform: translateX(3px); }
+
+  /* panel */
+  .detail-section { margin-bottom: 20px; background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); overflow: hidden; }
+  .detail-section-header { padding: 12px 16px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); font-size: 13px; font-weight: 700; color: var(--navy); display: flex; align-items: center; justify-content: space-between; }
+  .detail-section-body { padding: 14px 16px; }
+
+  /* toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 999; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; transform: translateY(60px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .detail-pane { animation: fadeIn .3s ease; }
+
+  /* tab content switching */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;">
+        <circle cx="12" cy="12" r="3" fill="#0D1F3C"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#0D1F3C" stroke-width="1.5" fill="none"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sidebar-logo-name">Galaxy</div>
+      <div class="sidebar-logo-sub">Admin Panel</div>
+    </div>
+  </div>
+  <div class="sidebar-section">Overview</div>
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-admin.html" class="sidebar-item"><span class="sidebar-icon">📊</span> Dashboard</a>
+    <a href="galaxy-uniforms-order-detail.html" class="sidebar-item"><span class="sidebar-icon">📦</span> Orders <span class="sidebar-badge">14</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🧵</span> Embroidery Queue <span class="sidebar-badge">8</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📋</span> Fulfillment <span class="sidebar-badge">23</span></a>
+  </div>
+  <div class="sidebar-section">Catalog</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item active"><span class="sidebar-icon">👕</span> Products & SKUs</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📦</span> Inventory <span class="sidebar-badge amber">3</span></a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🏷️</span> Pricing & Discounts</a>
+  </div>
+  <div class="sidebar-section">Schools & B2B</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🏫</span> Partner Schools</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">🛍️</span> School Storefronts</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">📝</span> Proposals & Quotes</a>
+  </div>
+  <div class="sidebar-section">Customers</div>
+  <div class="sidebar-nav">
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">👤</span> Customer Accounts</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">⭐</span> Galaxy Rewards</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">💬</span> Customer Service <span class="sidebar-badge">5</span></a>
+  </div>
+  <hr class="sidebar-divider">
+  <div class="sidebar-nav">
+    <a href="galaxy-uniforms-analytics.html" class="sidebar-item"><span class="sidebar-icon">📈</span> Reports & Analytics</a>
+    <a href="#" class="sidebar-item"><span class="sidebar-icon">⚙️</span> Settings</a>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">JG</div>
+    <div><div class="sidebar-user-name">James G.</div><div class="sidebar-user-role">Owner / Admin</div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">
+      👕 Products & SKU Manager
+      <span style="font-size:12px;color:var(--gray-400);font-weight:500;">148 products · 2,340 SKUs</span>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="showToast('Importing CSV...')">⬆ Import CSV</button>
+      <button class="topbar-btn" onclick="showToast('Exporting catalog...')">⬇ Export</button>
+      <button class="topbar-btn" onclick="showToast('Opening bulk editor...')">✏️ Bulk Edit</button>
+      <button class="topbar-btn primary" onclick="showToast('Opening new product form...')">+ New Product</button>
+    </div>
+  </div>
+
+  <!-- PAGE TABS -->
+  <div class="page-tabs">
+    <div class="page-tab active" onclick="setPageTab(this)">All Products <span class="tab-count">148</span></div>
+    <div class="page-tab" onclick="setPageTab(this)">Boys <span class="tab-count">62</span></div>
+    <div class="page-tab" onclick="setPageTab(this)">Girls <span class="tab-count">54</span></div>
+    <div class="page-tab" onclick="setPageTab(this)">Unisex / Toddler <span class="tab-count">18</span></div>
+    <div class="page-tab" onclick="setPageTab(this)">Accessories <span class="tab-count">14</span></div>
+    <div class="page-tab" onclick="setPageTab(this)">Drafts <span class="tab-count">7</span></div>
+    <div class="page-tab" onclick="setPageTab(this)">Archived <span class="tab-count">12</span></div>
+  </div>
+
+  <!-- SPLIT BODY -->
+  <div class="split-body">
+
+    <!-- LIST PANE -->
+    <div class="list-pane">
+      <div class="list-toolbar">
+        <div class="search-box">
+          <span class="search-box-icon">🔍</span>
+          <input type="text" placeholder="Search products, SKUs, colors…" id="productSearch">
+        </div>
+        <div class="filter-pill active" onclick="togglePill(this)">All</div>
+        <div class="filter-pill" onclick="togglePill(this)">Polos</div>
+        <div class="filter-pill" onclick="togglePill(this)">Pants</div>
+        <div class="filter-pill" onclick="togglePill(this)">Sweaters</div>
+        <div class="filter-pill" onclick="togglePill(this)">Low Stock</div>
+        <select class="filter-select" onchange="showToast('Filter applied')">
+          <option>All Statuses</option>
+          <option>Active</option>
+          <option>Draft</option>
+          <option>Archived</option>
+        </select>
+        <span class="results-label" id="resultsLabel">148 products</span>
+      </div>
+
+      <div class="product-list" id="productList">
+
+        <!-- Product rows -->
+        <div class="product-row selected" onclick="selectProduct(this, 'polo-classic')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#D8E0EE,#C4CCDE);">👕</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Classic Piqué Polo</div>
+            <div class="prod-row-meta">
+              <span>👦 Boys</span>
+              <span>8 colors</span>
+              <span>3 fits</span>
+              <span>🧵 Emb. enabled</span>
+            </div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$14.99</div>
+            <div class="prod-row-skus">96 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'polo-perf')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#E0EAE8,#D0DCDA);">👕</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Performance Polo — Moisture-Wicking</div>
+            <div class="prod-row-meta"><span>👦 Boys</span><span>5 colors</span><span>2 fits</span><span>⚡ Performance</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$17.99</div>
+            <div class="prod-row-skus">60 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'polo-wrinkle')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#E8EDF5,#D8E0EC);">👕</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Wrinkle-Free Oxford Polo</div>
+            <div class="prod-row-meta"><span>👦 Boys</span><span>4 colors</span><span>Regular</span><span>✨ Wrinkle-Free</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$22.99</div>
+            <div class="prod-row-skus">48 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'pants-twill')">
+          <div class="prod-status-dot dot-low"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#EDE8DC,#E0D8C8);">👖</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Adjustable Waist Twill Pants</div>
+            <div class="prod-row-meta"><span>👦 Boys</span><span>3 colors</span><span>Slim / Regular / Husky</span><span>⚠️ Low stock</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$18.99</div>
+            <div class="prod-row-skus">84 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'pants-flat')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#F0EAD6,#E4DCCA);">👖</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Flat Front Khaki Pants</div>
+            <div class="prod-row-meta"><span>👦 Boys</span><span>2 colors</span><span>Regular / Slim</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$16.99</div>
+            <div class="prod-row-skus">48 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'blouse-stretch')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#EEE8F4,#E4DCF0);">👚</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Stretch Blend Blouse — Girls</div>
+            <div class="prod-row-meta"><span>👧 Girls</span><span>3 colors</span><span>Regular / Junior</span><span>🧵 Emb. enabled</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$16.99</div>
+            <div class="prod-row-skus">54 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'skirt-pleat')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#F0E4EC,#E4D4E0);">🥻</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Plaid Box Pleat Jumper — Girls</div>
+            <div class="prod-row-meta"><span>👧 Girls</span><span>4 plaids</span><span>Sizes 4–16</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$24.99</div>
+            <div class="prod-row-skus">32 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'sweater-vneck')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#D8E0EC,#CCD4E4);">🧥</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">V-Neck Uniform Sweater</div>
+            <div class="prod-row-meta"><span>🧒 Unisex</span><span>5 colors</span><span>XS–XL</span><span>🧵 Emb. enabled</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$22.99</div>
+            <div class="prod-row-skus">40 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'polo-adaptive')">
+          <div class="prod-status-dot dot-active"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#E8EDF5,#D8E4F0);">👕</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Adaptive Easy-On Polo</div>
+            <div class="prod-row-meta"><span>🧒 Unisex</span><span>3 colors</span><span>♿ Adaptive</span><span>Magnetic buttons</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$24.99</div>
+            <div class="prod-row-skus">24 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'polo-husky')">
+          <div class="prod-status-dot dot-low"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#EDD8D8,#E0C8C8);">👕</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Husky Fit Piqué Polo</div>
+            <div class="prod-row-meta"><span>👦 Boys</span><span>6 colors</span><span>Husky Fit</span><span>⚠️ Low stock</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$15.99</div>
+            <div class="prod-row-skus">30 SKUs</div>
+          </div>
+        </div>
+
+        <div class="product-row" onclick="selectProduct(this, 'shorts-pullOn')">
+          <div class="prod-status-dot dot-draft"></div>
+          <div class="prod-thumb" style="background:linear-gradient(135deg,#E0EAE0,#D0DED0);">🩳</div>
+          <div class="prod-row-info">
+            <div class="prod-row-name">Pull-On Uniform Shorts — Draft</div>
+            <div class="prod-row-meta"><span>👦 Boys</span><span>2 colors</span><span>⚫ Draft</span></div>
+          </div>
+          <div class="prod-row-right">
+            <div class="prod-row-price">$13.99</div>
+            <div class="prod-row-skus">20 SKUs</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DETAIL PANE -->
+    <div class="detail-pane" id="detailPane">
+
+      <div class="detail-header">
+        <div class="detail-breadcrumb">Products › Boys › Polos › Classic Piqué Polo</div>
+        <div class="detail-title-row">
+          <div>
+            <div class="detail-title">Classic Piqué Polo</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+              <span class="status-badge sb-active">● Active</span>
+              <span style="font-size:12px;color:var(--gray-400);">ID: PRD-0041 · Updated 2h ago</span>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="detail-btn" onclick="showToast('Opening storefront preview...')">👁 Preview</button>
+            <button class="detail-btn danger" onclick="showToast('Archive product?')">Archive</button>
+            <button class="detail-btn primary" onclick="showToast('Changes saved! ✓')">Save</button>
+          </div>
+        </div>
+
+        <div class="detail-tabs">
+          <div class="detail-tab active" onclick="switchDetailTab(this,'overview')">Overview</div>
+          <div class="detail-tab" onclick="switchDetailTab(this,'skus')">SKUs & Inventory</div>
+          <div class="detail-tab" onclick="switchDetailTab(this,'pricing')">Pricing</div>
+          <div class="detail-tab" onclick="switchDetailTab(this,'schools')">Schools</div>
+          <div class="detail-tab" onclick="switchDetailTab(this,'settings')">Settings</div>
+        </div>
+      </div>
+
+      <div class="detail-body">
+
+        <!-- OVERVIEW TAB -->
+        <div class="tab-panel active" id="tab-overview">
+          <div class="img-strip">
+            <div class="img-thumb active" style="background:linear-gradient(135deg,#D8E0EE,#C4CCDE);">👕</div>
+            <div class="img-thumb" style="background:linear-gradient(135deg,#EAEAEA,#D8D8D8);">👕</div>
+            <div class="img-thumb" style="background:linear-gradient(135deg,#E8D8D8,#DCC8C8);">👕</div>
+            <div class="img-thumb" style="background:linear-gradient(135deg,#D8E4D8,#C8D8C8);">👕</div>
+            <div class="img-thumb img-add">＋</div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <div class="field-label">Product Name</div>
+              <input class="field-input" value="Classic Piqué Polo">
+            </div>
+            <div class="field-group">
+              <div class="field-label">Category</div>
+              <select class="field-input"><option selected>Polos</option><option>Shirts</option><option>Pants</option><option>Sweaters</option></select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <div class="field-label">Gender</div>
+              <select class="field-input"><option selected>Boys</option><option>Girls</option><option>Unisex</option><option>Toddler</option></select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Collection</div>
+              <select class="field-input"><option selected>Core Basics</option><option>Performance</option><option>Wrinkle-Free</option><option>Adaptive</option></select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Description</div>
+            <textarea class="field-textarea">Our best-selling school polo. 100% combed cotton piqué, reinforced double-stitched collar, 3-button corozo placket, and tagless label. Pre-shrunk and stain-release treated. Available in Regular, Slim, and Husky fits across 8 school-approved colors.</textarea>
+          </div>
+
+          <div class="field-row-3">
+            <div class="field-group">
+              <div class="field-label">Fabric</div>
+              <input class="field-input" value="100% Combed Cotton Piqué">
+            </div>
+            <div class="field-group">
+              <div class="field-label">Weight (GSM)</div>
+              <input class="field-input" value="200">
+            </div>
+            <div class="field-group">
+              <div class="field-label">Sleeve</div>
+              <select class="field-input"><option selected>Short Sleeve</option><option>Long Sleeve</option></select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Available Colors</div>
+            <div class="swatch-row">
+              <div class="color-chip active" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#0D1F3C;"></div>Navy</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#FFFFFF;border:1px solid #ccc;"></div>White</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#C0392B;"></div>Burgundy</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#2E7D32;"></div>Forest Green</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#1565C0;"></div>Royal Blue</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#FBC02D;"></div>Gold</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#616161;"></div>Gray</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')"><div class="color-dot" style="background:#6D4C41;"></div>Brown</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Available Fits</div>
+            <div class="swatch-row">
+              <div class="color-chip active" onclick="this.classList.toggle('active')">Regular</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">Slim</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">Husky</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Size Range</div>
+            <div class="swatch-row">
+              <div class="color-chip active" onclick="this.classList.toggle('active')">4</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">5</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">6</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">7</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">8</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">10</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">12</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">14</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">16</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">18</div>
+              <div class="color-chip active" onclick="this.classList.toggle('active')">20</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')">XS</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')">S</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')">M</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')">L</div>
+              <div class="color-chip" onclick="this.classList.toggle('active')">XL</div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-section-header">
+              🧵 Embroidery Settings
+              <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+            </div>
+            <div class="detail-section-body">
+              <div class="field-row">
+                <div class="field-group">
+                  <div class="field-label">Default Position</div>
+                  <select class="field-input"><option selected>Left Chest</option><option>Right Chest</option><option>Sleeve</option></select>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Embroidery Upcharge</div>
+                  <input class="field-input" value="$6.99">
+                </div>
+              </div>
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="field-label">School Embroidery Codes <span style="text-transform:none;font-weight:500;color:var(--gray-400);">— auto-applied when school matches</span></div>
+                <div class="emb-codes">
+                  <div class="emb-code-row">
+                    <div class="emb-school-name">🏫 St. Mary's Academy</div>
+                    <span class="emb-code-val">EMB-SMA-001</span>
+                    <span class="emb-position">Left Chest</span>
+                    <button class="sku-action" onclick="showToast('Editing embroidery code...')">Edit</button>
+                  </div>
+                  <div class="emb-code-row">
+                    <div class="emb-school-name">🏫 Lincoln Elementary</div>
+                    <span class="emb-code-val">EMB-LIN-004</span>
+                    <span class="emb-position">Left Chest</span>
+                    <button class="sku-action" onclick="showToast('Editing embroidery code...')">Edit</button>
+                  </div>
+                  <div class="emb-code-row">
+                    <div class="emb-school-name">🏫 Holy Cross School</div>
+                    <span class="emb-code-val">EMB-HCS-007</span>
+                    <span class="emb-position">Left Chest</span>
+                    <button class="sku-action" onclick="showToast('Editing embroidery code...')">Edit</button>
+                  </div>
+                </div>
+                <button style="margin-top:8px;font-size:12px;font-weight:700;color:var(--navy);background:var(--gray-100);border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="showToast('Add embroidery code...')">+ Add School Code</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SKUs TAB -->
+        <div class="tab-panel" id="tab-skus">
+          <div class="sku-section">
+            <div class="sku-section-header">
+              <div class="sku-section-title">96 SKUs — Classic Piqué Polo</div>
+              <div style="display:flex;gap:6px;">
+                <button class="sku-add-btn" onclick="showToast('Generating SKUs from matrix...')">⚡ Auto-Generate</button>
+                <button class="sku-add-btn" onclick="showToast('Adding SKU...')">+ Add SKU</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+              <div class="filter-pill active" onclick="togglePill(this)">All Fits</div>
+              <div class="filter-pill" onclick="togglePill(this)">Regular</div>
+              <div class="filter-pill" onclick="togglePill(this)">Slim</div>
+              <div class="filter-pill" onclick="togglePill(this)">Husky</div>
+              <div class="filter-pill" style="border-color:var(--red);color:var(--red);" onclick="togglePill(this)">⚠ Low / OOS</div>
+            </div>
+            <table class="sku-table">
+              <thead>
+                <tr>
+                  <th>SKU Code</th>
+                  <th>Color</th>
+                  <th>Size</th>
+                  <th>Fit</th>
+                  <th>Stock</th>
+                  <th>Price</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="sku-code">CP-NVY-04-REG</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#0D1F3C;"></div>Navy</div></td>
+                  <td>4</td><td>Regular</td>
+                  <td><span class="sku-stock stock-ok">142</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" onclick="showToast('Editing SKU...')">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-NVY-06-REG</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#0D1F3C;"></div>Navy</div></td>
+                  <td>6</td><td>Regular</td>
+                  <td><span class="sku-stock stock-ok">98</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" onclick="showToast('Editing SKU...')">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-NVY-08-REG</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#0D1F3C;"></div>Navy</div></td>
+                  <td>8</td><td>Regular</td>
+                  <td><span class="sku-stock stock-oos">6</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" style="color:var(--red);font-weight:700;" onclick="showToast('Reorder placed for CP-NVY-08-REG!')">Reorder</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-NVY-10-REG</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#0D1F3C;"></div>Navy</div></td>
+                  <td>10</td><td>Regular</td>
+                  <td><span class="sku-stock stock-ok">212</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" onclick="showToast('Editing SKU...')">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-NVY-10-SLM</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#0D1F3C;"></div>Navy</div></td>
+                  <td>10</td><td>Slim</td>
+                  <td><span class="sku-stock stock-ok">87</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" onclick="showToast('Editing SKU...')">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-NVY-10-HSK</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#0D1F3C;"></div>Navy</div></td>
+                  <td>10H</td><td>Husky</td>
+                  <td><span class="sku-stock stock-low">24</span></td>
+                  <td><input class="sku-inline-input" value="$15.99"></td>
+                  <td><button class="sku-action" onclick="showToast('Editing SKU...')">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-WHT-06-REG</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#fff;border:1px solid #ccc;"></div>White</div></td>
+                  <td>6</td><td>Regular</td>
+                  <td><span class="sku-stock stock-low">18</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" style="color:var(--amber);font-weight:700;" onclick="showToast('Reorder placed for CP-WHT-06-REG!')">Reorder</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-WHT-08-REG</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#fff;border:1px solid #ccc;"></div>White</div></td>
+                  <td>8</td><td>Regular</td>
+                  <td><span class="sku-stock stock-ok">156</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" onclick="showToast('Editing SKU...')">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="sku-code">CP-BUR-08-REG</span></td>
+                  <td><div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#C0392B;"></div>Burgundy</div></td>
+                  <td>8</td><td>Regular</td>
+                  <td><span class="sku-stock stock-ok">74</span></td>
+                  <td><input class="sku-inline-input" value="$14.99"></td>
+                  <td><button class="sku-action" onclick="showToast('Editing SKU...')">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="padding:12px 0;text-align:center;">
+              <button style="font-size:12px;font-weight:600;color:var(--navy);background:var(--gray-100);border:none;padding:7px 16px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="showToast('Loading all 96 SKUs...')">Load all 96 SKUs →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRICING TAB -->
+        <div class="tab-panel" id="tab-pricing">
+          <div class="detail-section">
+            <div class="detail-section-header">💰 Base Pricing</div>
+            <div class="detail-section-body">
+              <div class="field-row">
+                <div class="field-group"><div class="field-label">Base Price</div><input class="field-input" value="$14.99"></div>
+                <div class="field-group"><div class="field-label">Cost of Goods</div><input class="field-input" value="$5.80"></div>
+              </div>
+              <div class="field-row">
+                <div class="field-group"><div class="field-label">Compare-at Price</div><input class="field-input" value="—" placeholder="For showing strikethrough"></div>
+                <div class="field-group"><div class="field-label">Margin</div><div class="field-input" style="background:var(--green-pale);color:var(--green);font-weight:700;display:flex;align-items:center;">61.3% 🟢</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-header">📦 Volume Pricing Tiers <button class="sku-add-btn" onclick="showToast('Adding tier...')">+ Add Tier</button></div>
+            <div class="detail-section-body">
+              <div class="pricing-tiers">
+                <div class="pricing-tier-row">
+                  <span class="pricing-tier-label" style="font-size:11px;color:var(--gray-500);font-weight:700;">QTY</span>
+                  <span style="font-size:11px;color:var(--gray-500);font-weight:700;">PRICE / ITEM</span>
+                  <span style="font-size:11px;color:var(--gray-500);font-weight:700;">SAVINGS</span>
+                  <span></span>
+                </div>
+                <div class="pricing-tier-row">
+                  <span class="pricing-tier-label">1 item</span>
+                  <input class="field-input" value="$14.99" style="height:32px;padding:4px 8px;font-size:13px;">
+                  <span class="tier-save">—</span>
+                  <button class="sku-action" onclick="showToast('Editing tier...')">Edit</button>
+                </div>
+                <div class="pricing-tier-row">
+                  <span class="pricing-tier-label">3+ items</span>
+                  <input class="field-input" value="$13.49" style="height:32px;padding:4px 8px;font-size:13px;">
+                  <span class="tier-save">−10%</span>
+                  <button class="sku-action" onclick="showToast('Editing tier...')">Edit</button>
+                </div>
+                <div class="pricing-tier-row">
+                  <span class="pricing-tier-label">6+ items</span>
+                  <input class="field-input" value="$11.99" style="height:32px;padding:4px 8px;font-size:13px;">
+                  <span class="tier-save">−20%</span>
+                  <button class="sku-action" onclick="showToast('Editing tier...')">Edit</button>
+                </div>
+                <div class="pricing-tier-row">
+                  <span class="pricing-tier-label">12+ items</span>
+                  <input class="field-input" value="$10.49" style="height:32px;padding:4px 8px;font-size:13px;">
+                  <span class="tier-save">−30%</span>
+                  <button class="sku-action" onclick="showToast('Editing tier...')">Edit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-header">🏫 School Bulk Discount</div>
+            <div class="detail-section-body">
+              <div class="toggle-row">
+                <div><div class="toggle-label">Apply school partner discount</div><div class="toggle-sub">Automatically discount 5% for verified school accounts</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+              <div class="toggle-row">
+                <div><div class="toggle-label">Bulk order minimum</div><div class="toggle-sub">Require minimum 12 units for bulk pricing</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCHOOLS TAB -->
+        <div class="tab-panel" id="tab-schools">
+          <div class="detail-section">
+            <div class="detail-section-header">🏫 School Assignments <span style="font-size:12px;color:var(--green);font-weight:700;">2,041 schools · 1,847 assigned</span></div>
+            <div class="detail-section-body">
+              <input class="field-input" placeholder="🔍 Search schools..." style="margin-bottom:10px;">
+              <div class="school-assign-list">
+                <div class="school-assign-row assigned" onclick="this.classList.toggle('assigned')">
+                  <div class="school-check">✓</div>
+                  <div class="school-assign-color" style="background:#0D1F3C;"></div>
+                  <div class="school-assign-name">St. Mary's Academy — Newark, NJ</div>
+                  <span style="font-size:10px;color:var(--green);font-weight:700;">Required item</span>
+                </div>
+                <div class="school-assign-row assigned" onclick="this.classList.toggle('assigned')">
+                  <div class="school-check">✓</div>
+                  <div class="school-assign-color" style="background:#1565C0;"></div>
+                  <div class="school-assign-name">Lincoln Elementary — Brooklyn, NY</div>
+                  <span style="font-size:10px;color:var(--gray-500);">Optional</span>
+                </div>
+                <div class="school-assign-row assigned" onclick="this.classList.toggle('assigned')">
+                  <div class="school-check">✓</div>
+                  <div class="school-assign-color" style="background:#C0392B;"></div>
+                  <div class="school-assign-name">Holy Cross School — Newark, NJ</div>
+                  <span style="font-size:10px;color:var(--green);font-weight:700;">Required item</span>
+                </div>
+                <div class="school-assign-row assigned" onclick="this.classList.toggle('assigned')">
+                  <div class="school-check">✓</div>
+                  <div class="school-assign-color" style="background:#2E7D32;"></div>
+                  <div class="school-assign-name">Sacred Heart — Jersey City, NJ</div>
+                  <span style="font-size:10px;color:var(--green);font-weight:700;">Required item</span>
+                </div>
+                <div class="school-assign-row" onclick="this.classList.toggle('assigned')">
+                  <div class="school-check"></div>
+                  <div class="school-assign-color" style="background:#FBC02D;"></div>
+                  <div class="school-assign-name">JFK Middle School — Bronx, NY</div>
+                  <span style="font-size:10px;color:var(--gray-400);">Not assigned</span>
+                </div>
+                <div class="school-assign-row" onclick="this.classList.toggle('assigned')">
+                  <div class="school-check"></div>
+                  <div class="school-assign-color" style="background:#616161;"></div>
+                  <div class="school-assign-name">St. Francis Prep — Queens, NY</div>
+                  <span style="font-size:10px;color:var(--gray-400);">Not assigned</span>
+                </div>
+              </div>
+              <button style="width:100%;margin-top:10px;background:var(--navy);color:white;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="showToast('Bulk assignment tool opening...')">⚡ Bulk Assign to All Schools →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div class="tab-panel" id="tab-settings">
+          <div class="detail-section">
+            <div class="detail-section-header">⚙️ Product Settings</div>
+            <div class="detail-section-body">
+              <div class="toggle-row">
+                <div><div class="toggle-label">Show on storefront</div><div class="toggle-sub">Product visible to customers</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+              <div class="toggle-row">
+                <div><div class="toggle-label">Embroidery available</div><div class="toggle-sub">Show embroidery add-on option</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+              <div class="toggle-row">
+                <div><div class="toggle-label">Allow backorders</div><div class="toggle-sub">Let customers order when out of stock</div></div>
+                <div class="toggle-switch off" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+              <div class="toggle-row">
+                <div><div class="toggle-label">School Approved badge</div><div class="toggle-sub">Show "School Approved" badge on PDP</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+              <div class="toggle-row">
+                <div><div class="toggle-label">Featured in bundles</div><div class="toggle-sub">Include in bundle builder suggestions</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+              <div class="toggle-row">
+                <div><div class="toggle-label">Show low stock warning</div><div class="toggle-sub">Display "X left" when below 20 units</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off');"></div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-header">🔗 SEO & Metadata</div>
+            <div class="detail-section-body">
+              <div class="field-group"><div class="field-label">URL Slug</div><input class="field-input" value="boys-classic-pique-polo"></div>
+              <div class="field-group"><div class="field-label">Meta Title</div><input class="field-input" value="Classic Piqué Polo — Boys School Uniform | Galaxy Uniforms"></div>
+              <div class="field-group" style="margin-bottom:0;"><div class="field-label">Meta Description</div><textarea class="field-textarea" style="min-height:56px;">Shop our best-selling Classic Piqué Polo for boys. School-approved colors, Regular/Slim/Husky fits, sizes 4–20. Embroidery available. Free returns.</textarea></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /detail-body -->
+    </div><!-- /detail-pane -->
+  </div><!-- /split-body -->
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span>✓</span><span id="toastMsg">Saved!</span></div>
+
+<script>
+  function selectProduct(row, id) {
+    document.querySelectorAll('.product-row').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+    showToast('Loading product: ' + row.querySelector('.prod-row-name').textContent);
+  }
+
+  function setPageTab(el) {
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    showToast('Showing: ' + el.textContent.trim());
+  }
+
+  function switchDetailTab(el, tabId) {
+    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+  }
+
+  function togglePill(el) {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Live search filter
+  document.getElementById('productSearch').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    let count = 0;
+    document.querySelectorAll('.product-row').forEach(row => {
+      const name = row.querySelector('.prod-row-name').textContent.toLowerCase();
+      const show = name.includes(q);
+      row.style.display = show ? '' : 'none';
+      if (show) count++;
+    });
+    document.getElementById('resultsLabel').textContent = count + ' products';
+  });
+</script>
+</body>
+</html>

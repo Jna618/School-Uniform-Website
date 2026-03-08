@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout – Galaxy Uniforms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1F3C; --navy-mid: #1A3358; --navy-light: #2A4A7A;
+    --gold: #E8A020; --gold-light: #F5C050; --gold-pale: rgba(232,160,32,0.09);
+    --cream: #FAFAF7; --white: #FFFFFF;
+    --gray-50: #F8F9FA; --gray-100: #F0F2F5; --gray-200: #E4E8ED;
+    --gray-300: #CBD0D8; --gray-400: #9CA3AF; --gray-500: #6B7280; --gray-700: #374151;
+    --green: #1A7A4A; --green-pale: rgba(26,122,74,0.09);
+    --red: #E03C31; --red-pale: rgba(224,60,49,0.08);
+    --shadow-sm: 0 1px 4px rgba(13,31,60,0.07);
+    --shadow-md: 0 4px 20px rgba(13,31,60,0.11);
+    --shadow-lg: 0 12px 40px rgba(13,31,60,0.18);
+    --radius: 14px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--navy); min-height: 100vh; }
+
+  .util-bar { background: var(--navy); color: rgba(255,255,255,0.65); font-size: 12px; padding: 8px 0; }
+  .util-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+  header { background: var(--white); border-bottom: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .header-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 66px; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-icon { width: 38px; height: 38px; background: var(--navy); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .logo-name { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 800; color: var(--navy); }
+  .logo-sub { font-size: 10px; font-weight: 500; color: var(--gray-400); letter-spacing: 1.5px; text-transform: uppercase; }
+  .header-secure { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--green); }
+
+  .steps-bar { background: var(--white); border-bottom: 1px solid var(--gray-100); padding: 16px 0; }
+  .steps-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: center; gap: 0; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--gray-400); cursor: pointer; transition: color .2s; }
+  .step.active { color: var(--navy); }
+  .step.done { color: var(--green); }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; transition: all .2s; }
+  .step.active .step-num { border-color: var(--navy); background: var(--navy); color: white; }
+  .step.done .step-num { border-color: var(--green); background: var(--green); color: white; }
+  .step-connector { width: 72px; height: 2px; background: var(--gray-200); margin: 0 10px; transition: background .3s; }
+  .step-connector.done { background: var(--green); }
+
+  .checkout-main { max-width: 1100px; margin: 0 auto; padding: 28px 24px 80px; display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; animation: fadeSlide .35s ease both; }
+  @keyframes fadeSlide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+
+  .form-card { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 16px; }
+  .form-card-header { padding: 18px 24px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 10px; }
+  .form-card-num { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: white; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .form-card-title { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .form-card-body { padding: 22px 24px; }
+
+  .field-row { display: grid; gap: 14px; margin-bottom: 14px; }
+  .field-row.col2 { grid-template-columns: 1fr 1fr; }
+  .field-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-label { font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; }
+  .field-input { padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: 9px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; transition: border-color .2s, box-shadow .2s; background: white; }
+  .field-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(13,31,60,0.08); }
+  .field-input::placeholder { color: var(--gray-300); }
+  .field-select { padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: 9px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--navy); outline: none; background: white; cursor: pointer; }
+  .field-hint { font-size: 11px; color: var(--gray-400); margin-top: 3px; }
+
+  .ship-options { display: flex; flex-direction: column; gap: 8px; }
+  .ship-option { border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all .18s; display: flex; align-items: center; gap: 14px; }
+  .ship-option:hover { border-color: var(--navy-light); background: var(--gray-50); }
+  .ship-option.selected { border-color: var(--navy); background: #EEF2F8; }
+  .ship-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gray-300); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .ship-option.selected .ship-radio { border-color: var(--navy); background: var(--navy); }
+  .ship-option.selected .ship-radio::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; }
+  .ship-info { flex: 1; }
+  .ship-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .ship-eta { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .ship-price { font-size: 15px; font-weight: 800; color: var(--navy); flex-shrink: 0; }
+  .ship-badge { font-size: 10px; font-weight: 700; background: var(--green-pale); color: var(--green); padding: 2px 7px; border-radius: 4px; margin-left: 7px; }
+
+  .payment-tabs { display: flex; gap: 0; border: 1.5px solid var(--gray-200); border-radius: 10px; overflow: hidden; margin-bottom: 18px; }
+  .payment-tab { flex: 1; padding: 11px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; background: white; color: var(--gray-500); border: none; border-right: 1px solid var(--gray-200); font-family: 'DM Sans', sans-serif; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .payment-tab:last-child { border-right: none; }
+  .payment-tab.active { background: var(--navy); color: white; }
+  .card-icons { display: flex; gap: 6px; margin-bottom: 16px; }
+  .card-icon { width: 44px; height: 28px; border-radius: 5px; border: 1.5px solid var(--gray-200); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .card-number-wrap { position: relative; }
+  .card-type-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 20px; }
+
+  .same-address-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; cursor: pointer; }
+  .checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--gray-300); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .checkbox.checked { background: var(--navy); border-color: var(--navy); }
+  .checkbox.checked::after { content: '✓'; font-size: 11px; color: white; font-weight: 800; }
+  .same-address-label { font-size: 14px; font-weight: 500; color: var(--navy); }
+
+  .review-section { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 16px; }
+  .review-section-header { padding: 14px 20px; background: var(--gray-50); border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+  .review-section-title { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .review-edit { font-size: 12px; font-weight: 600; color: var(--navy); background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: underline; }
+  .review-item { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid var(--gray-100); }
+  .review-item:last-child { border-bottom: none; }
+  .review-thumb { width: 48px; height: 48px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; border: 1px solid var(--gray-100); }
+  .review-item-name { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+  .review-item-meta { font-size: 11px; color: var(--gray-500); }
+  .review-item-price { font-size: 14px; font-weight: 800; color: var(--navy); margin-left: auto; flex-shrink: 0; }
+  .review-info-block { padding: 14px 20px; font-size: 13px; color: var(--navy); line-height: 1.7; }
+  .review-info-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-400); margin-bottom: 4px; }
+
+  .summary-sticky { position: sticky; top: 20px; }
+  .summary-card { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 14px; }
+  .summary-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .summary-title { font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+  .summary-toggle { font-size: 12px; color: var(--gray-500); font-weight: 600; }
+  .summary-items { border-bottom: 1px solid var(--gray-100); }
+  .summary-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; border-bottom: 1px solid var(--gray-50); }
+  .summary-item:last-child { border-bottom: none; }
+  .si-thumb { width: 40px; height: 40px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; border: 1px solid var(--gray-100); position: relative; }
+  .si-qty { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: var(--navy); color: white; border-radius: 50%; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .si-name { font-size: 12px; font-weight: 600; color: var(--navy); flex: 1; line-height: 1.3; }
+  .si-meta { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+  .si-price { font-size: 13px; font-weight: 700; color: var(--navy); flex-shrink: 0; }
+  .summary-body { padding: 16px 20px; }
+  .sum-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 9px; }
+  .sum-row-label { color: var(--gray-600); }
+  .sum-row-val { font-weight: 600; color: var(--navy); }
+  .sum-row.savings .sum-row-val { color: var(--green); }
+  .sum-divider { border: none; border-top: 1px solid var(--gray-100); margin: 12px 0; }
+  .sum-total-row { display: flex; align-items: baseline; justify-content: space-between; }
+  .sum-total-label { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .sum-total-val { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 800; color: var(--navy); }
+  .sum-tax-note { font-size: 11px; color: var(--gray-400); text-align: right; margin-top: 2px; }
+  .trust-list { display: flex; flex-direction: column; gap: 7px; padding: 14px 20px; background: var(--gray-50); border-top: 1px solid var(--gray-100); }
+  .trust-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray-600); }
+
+  .continue-btn { width: 100%; background: var(--navy); color: white; border: none; padding: 16px; border-radius: 11px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
+  .continue-btn:hover { background: var(--navy-light); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .back-link { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--gray-500); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; margin-top: 12px; transition: color .15s; }
+  .back-link:hover { color: var(--navy); }
+
+  .confirm-hero { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%); border-radius: var(--radius); padding: 36px 32px; text-align: center; color: white; position: relative; overflow: hidden; margin-bottom: 20px; }
+  .confirm-stars { position: absolute; inset: 0; background-image: radial-gradient(1.5px 1.5px at 15% 25%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1px 1px at 40% 60%, rgba(232,160,32,0.4) 0%, transparent 100%), radial-gradient(2px 2px at 65% 20%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1.5px 1.5px at 80% 75%, rgba(255,255,255,0.4) 0%, transparent 100%); pointer-events: none; }
+  .confirm-check { width: 70px; height: 70px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 18px; box-shadow: 0 0 0 12px rgba(26,122,74,0.2); animation: popIn .6s cubic-bezier(.34,1.56,.64,1) both; position: relative; z-index: 1; }
+  @keyframes popIn { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+  .confirm-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; position: relative; z-index: 1; }
+  .confirm-subtitle { font-size: 14px; color: rgba(255,255,255,0.7); position: relative; z-index: 1; }
+  .confirm-order-num { font-size: 14px; font-weight: 700; color: var(--gold-light); margin-top: 10px; position: relative; z-index: 1; }
+  .confirm-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .confirm-card { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); padding: 18px 20px; box-shadow: var(--shadow-sm); }
+  .confirm-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gray-400); margin-bottom: 8px; }
+  .confirm-card-content { font-size: 13px; color: var(--navy); line-height: 1.7; }
+  .tracking-card { background: var(--white); border-radius: var(--radius); border: 1.5px solid var(--gray-200); padding: 18px 20px; box-shadow: var(--shadow-sm); margin-bottom: 14px; }
+  .tracking-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .tracking-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .tracking-steps { display: flex; align-items: flex-start; }
+  .track-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
+  .track-step::after { content: ''; position: absolute; top: 14px; left: 50%; width: 100%; height: 2px; background: var(--gray-200); z-index: 0; }
+  .track-step:last-child::after { display: none; }
+  .track-step.done::after { background: var(--green); }
+  .track-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; position: relative; z-index: 1; font-weight: 700; flex-shrink: 0; }
+  .track-step.pending .track-dot { background: var(--gray-200); }
+  .track-label { font-size: 10px; font-weight: 600; color: var(--gray-500); text-align: center; line-height: 1.3; }
+  .track-step.done .track-label { color: var(--green); }
+  .rewards-earn { background: linear-gradient(135deg, var(--gold-pale), rgba(232,160,32,0.04)); border: 1.5px solid rgba(232,160,32,0.4); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+  .rewards-icon { font-size: 28px; flex-shrink: 0; }
+  .rewards-text strong { font-size: 15px; font-weight: 800; color: var(--navy); display: block; margin-bottom: 3px; }
+  .rewards-text span { font-size: 12px; color: var(--gray-500); }
+  .confirm-actions { display: flex; gap: 10px; }
+  .confirm-btn { flex: 1; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; border: none; transition: all .15s; }
+  .confirm-btn.primary { background: var(--navy); color: white; }
+  .confirm-btn.secondary { background: var(--gray-100); color: var(--navy); }
+
+  .express-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+  .express-line { flex: 1; height: 1px; background: var(--gray-200); }
+  .express-text { font-size: 11px; color: var(--gray-400); font-weight: 600; white-space: nowrap; }
+  .express-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .express-btn { padding: 11px; border-radius: 8px; border: 1.5px solid var(--gray-200); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all .15s; background: white; color: var(--gray-700); font-family: 'DM Sans', sans-serif; }
+  .express-btn.apple { background: #000; color: white; border-color: #000; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 13px 18px; border-radius: 11px; font-size: 13px; font-weight: 600; z-index: 999; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; transform: translateY(80px); opacity: 0; transition: all .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 900px) {
+    .checkout-main { grid-template-columns: 1fr; }
+    .summary-sticky { position: static; }
+    .confirm-cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="util-bar">
+  <div class="util-inner">
+    <span>🔒 Secure checkout — 256-bit SSL encrypted</span>
+    <span>📞 Need help? 1-800-GALAXY-U</span>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a href="galaxy-uniforms-homepage.html" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" style="width:20px;height:20px;">
+          <circle cx="12" cy="12" r="3" fill="#E8A020"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#E8A020" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div><div class="logo-name">Galaxy Uniforms</div><div class="logo-sub">School Apparel</div></div>
+    </a>
+    <div class="header-secure">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      Secure Checkout
+    </div>
+  </div>
+</header>
+
+<div class="steps-bar">
+  <div class="steps-inner">
+    <div class="step done" onclick="goToStep(1)" id="step1"><div class="step-num">✓</div><span>Cart</span></div>
+    <div class="step-connector done" id="conn1"></div>
+    <div class="step active" id="step2"><div class="step-num">2</div><span>Shipping</span></div>
+    <div class="step-connector" id="conn2"></div>
+    <div class="step" id="step3"><div class="step-num">3</div><span>Payment</span></div>
+    <div class="step-connector" id="conn3"></div>
+    <div class="step" id="step4"><div class="step-num">4</div><span>Review</span></div>
+    <div class="step-connector" id="conn4"></div>
+    <div class="step" id="step5"><div class="step-num">5</div><span>Confirmation</span></div>
+  </div>
+</div>
+
+<div class="checkout-main">
+
+  <!-- STEP 2 — SHIPPING -->
+  <div class="step-panel active" id="panel2">
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">1</div>
+        <div class="form-card-title">Contact Information</div>
+        <span style="margin-left:auto;font-size:12px;color:var(--gray-500);">Have an account? <a href="galaxy-uniforms-account.html" style="color:var(--navy);font-weight:700;">Log in</a></span>
+      </div>
+      <div class="form-card-body">
+        <div class="field-row col2">
+          <div class="field-group"><label class="field-label">First Name</label><input class="field-input" type="text" value="Jennifer"></div>
+          <div class="field-group"><label class="field-label">Last Name</label><input class="field-input" type="text" value="Torres"></div>
+        </div>
+        <div class="field-row"><div class="field-group"><label class="field-label">Email Address</label><input class="field-input" type="email" value="j.torres@email.com"><span class="field-hint">Order confirmation will be sent here</span></div></div>
+        <div class="field-row"><div class="field-group"><label class="field-label">Phone Number</label><input class="field-input" type="tel" value="(201) 555-0142"><span class="field-hint">For delivery notifications</span></div></div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-header"><div class="form-card-num">2</div><div class="form-card-title">Shipping Address</div></div>
+      <div class="form-card-body">
+        <div class="field-row"><div class="field-group"><label class="field-label">Street Address</label><input class="field-input" type="text" value="142 Oak Avenue"></div></div>
+        <div class="field-row"><div class="field-group"><label class="field-label">Apt, Suite, Unit (optional)</label><input class="field-input" type="text" placeholder="Apt 4B"></div></div>
+        <div class="field-row col3">
+          <div class="field-group"><label class="field-label">City</label><input class="field-input" type="text" value="Newark"></div>
+          <div class="field-group"><label class="field-label">State</label><select class="field-select"><option>NJ</option><option>NY</option><option>CT</option><option>PA</option></select></div>
+          <div class="field-group"><label class="field-label">ZIP Code</label><input class="field-input" type="text" value="07102"></div>
+        </div>
+        <div class="field-row"><div class="field-group"><label class="field-label">Country</label><select class="field-select"><option>United States</option><option>Canada</option></select></div></div>
+        <div class="same-address-row" onclick="toggleCB('saveAddr')"><div class="checkbox checked" id="saveAddr"></div><span class="same-address-label">Save this address to my account</span></div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-header"><div class="form-card-num">3</div><div class="form-card-title">Shipping Method</div></div>
+      <div class="form-card-body">
+        <div class="ship-options">
+          <div class="ship-option" onclick="selectShip(this,'free','FREE','Free Shipping')"><div class="ship-radio"></div><div class="ship-info"><div class="ship-name">Standard Shipping — USPS First Class <span class="ship-badge">FREE</span></div><div class="ship-eta">Est. delivery: Mar 10–12, 2026 (5–7 days)</div></div><div class="ship-price" style="color:var(--green);">FREE</div></div>
+          <div class="ship-option selected" onclick="selectShip(this,'priority','$7.40','USPS Priority')"><div class="ship-radio"></div><div class="ship-info"><div class="ship-name">Priority Shipping — USPS Priority Mail</div><div class="ship-eta">Est. delivery: Mar 7–8, 2026 (2–3 days)</div></div><div class="ship-price">$7.40</div></div>
+          <div class="ship-option" onclick="selectShip(this,'express','$16.90','FedEx 2-Day')"><div class="ship-radio"></div><div class="ship-info"><div class="ship-name">Express Shipping — FedEx 2-Day</div><div class="ship-eta">Est. delivery: Mar 7, 2026 (2 days)</div></div><div class="ship-price">$16.90</div></div>
+          <div class="ship-option" onclick="selectShip(this,'overnight','$34.99','FedEx Overnight')"><div class="ship-radio"></div><div class="ship-info"><div class="ship-name">Overnight — FedEx Priority Overnight</div><div class="ship-eta">Est. delivery: Mar 6, 2026 (next business day)</div></div><div class="ship-price">$34.99</div></div>
+        </div>
+        <div style="margin-top:14px;background:var(--green-pale);border-radius:9px;padding:11px 14px;font-size:12px;color:var(--navy);">🎉 <strong>You qualify for free shipping!</strong> Your order is above $75. Select Standard to save $7.40.</div>
+      </div>
+    </div>
+    <button class="continue-btn" onclick="goToStep(3)">Continue to Payment →</button>
+    <button class="back-link" onclick="window.location='galaxy-uniforms-cart.html'">← Return to Cart</button>
+  </div>
+
+  <!-- STEP 3 — PAYMENT -->
+  <div class="step-panel" id="panel3">
+    <div class="form-card">
+      <div class="form-card-header"><div class="form-card-num">1</div><div class="form-card-title">Payment Method</div></div>
+      <div class="form-card-body">
+        <div class="express-row" style="margin-bottom:4px;">
+          <button class="express-btn apple" onclick="showToast('Apple Pay...')"> Pay</button>
+          <button class="express-btn" onclick="showToast('Google Pay...')">G Pay</button>
+        </div>
+        <div class="express-divider"><div class="express-line"></div><span class="express-text">OR PAY WITH CARD</span><div class="express-line"></div></div>
+        <div class="payment-tabs">
+          <button class="payment-tab active" onclick="setPayTab(this)">💳 Credit / Debit</button>
+          <button class="payment-tab" onclick="setPayTab(this)">🏦 PayPal</button>
+          <button class="payment-tab" onclick="setPayTab(this)"><em style="color:var(--gold);">klarna.</em></button>
+        </div>
+        <div class="card-icons"><div class="card-icon">💳</div><div class="card-icon" style="font-size:14px;font-weight:800;color:#1565C0;">VISA</div><div class="card-icon" style="font-size:10px;font-weight:800;color:#EB001B;">MC</div><div class="card-icon" style="font-size:10px;font-weight:800;color:#2E77BC;">AMEX</div></div>
+        <div class="field-row" style="margin-bottom:14px;"><div class="field-group"><label class="field-label">Name on Card</label><input class="field-input" type="text" value="Jennifer Torres"></div></div>
+        <div class="field-row" style="margin-bottom:14px;"><div class="field-group"><label class="field-label">Card Number</label><div class="card-number-wrap"><input class="field-input" type="text" value="4291 •••• •••• 4291" style="width:100%;padding-right:44px;"><span class="card-type-icon">💳</span></div></div></div>
+        <div class="field-row col2"><div class="field-group"><label class="field-label">Expiry</label><input class="field-input" value="09 / 28"></div><div class="field-group"><label class="field-label">CVV</label><input class="field-input" placeholder="•••" maxlength="4"></div></div>
+        <div class="same-address-row" onclick="toggleCB('billSame')"><div class="checkbox checked" id="billSame"></div><span class="same-address-label">Billing address same as shipping</span></div>
+        <div style="margin-top:12px;background:var(--green-pale);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--navy);display:flex;align-items:center;gap:8px;"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Payment is encrypted and secure.</div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-header"><div class="form-card-num">2</div><div class="form-card-title">Galaxy Rewards</div><span style="margin-left:auto;font-size:12px;background:var(--gold-pale);color:#8A6000;font-weight:700;padding:3px 10px;border-radius:6px;">⭐ 840 pts = $8.40</span></div>
+      <div class="form-card-body">
+        <div class="same-address-row" onclick="toggleCB('rewardsUse');updateRewards()" style="margin-bottom:0;"><div class="checkbox checked" id="rewardsUse"></div><span class="same-address-label">Apply 840 points (−$8.40) to this order</span></div>
+        <div style="margin-top:10px;font-size:12px;color:var(--gray-500);">You'll earn <strong>+164 points</strong> from this order.</div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-header"><div class="form-card-num">3</div><div class="form-card-title">Promo Code</div></div>
+      <div class="form-card-body" style="padding:16px 24px;">
+        <div style="display:flex;gap:8px;"><input class="field-input" id="promoIn" placeholder="Enter code (try SCHOOL10)" style="flex:1;"><button style="background:var(--navy);color:white;border:none;padding:11px 20px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="applyPromo()">Apply</button></div>
+        <div id="promoApplied" style="display:none;margin-top:10px;background:var(--green-pale);border-radius:7px;padding:9px 12px;font-size:13px;color:var(--green);font-weight:600;align-items:center;gap:8px;">🎉 SCHOOL10 applied — 10% off! <span style="margin-left:auto;cursor:pointer;color:var(--gray-500);font-size:12px;" onclick="removePromo()">Remove ×</span></div>
+      </div>
+    </div>
+
+    <button class="continue-btn" onclick="goToStep(4)">Review Order →</button>
+    <button class="back-link" onclick="goToStep(2)">← Back to Shipping</button>
+  </div>
+
+  <!-- STEP 4 — REVIEW -->
+  <div class="step-panel" id="panel4">
+    <div class="review-section">
+      <div class="review-section-header"><div class="review-section-title">🛒 Order Items (7)</div><button class="review-edit" onclick="window.location='galaxy-uniforms-cart.html'">Edit</button></div>
+      <div class="review-item"><div class="review-thumb" style="background:linear-gradient(135deg,#D0D8EC,#BEC8DC);">👕</div><div style="flex:1;"><div class="review-item-name">Classic Piqué Polo × 3</div><div class="review-item-meta">Navy · Size 10 · 🧵 Embroidery · 👦 Marcus</div></div><div class="review-item-price">$40.47</div></div>
+      <div class="review-item"><div class="review-thumb" style="background:linear-gradient(135deg,#EDE8DC,#E0D8C8);">👖</div><div style="flex:1;"><div class="review-item-name">Adjustable Twill Pants × 1</div><div class="review-item-meta">Khaki · Size 10 Slim · 👦 Marcus</div></div><div class="review-item-price">$14.99</div></div>
+      <div class="review-item"><div class="review-thumb" style="background:linear-gradient(135deg,#EEE8F4,#E4DCF0);">👚</div><div style="flex:1;"><div class="review-item-name">Stretch Blend Blouse × 2</div><div class="review-item-meta">White · Size 12 · 👧 Sofia</div></div><div class="review-item-price">$33.98</div></div>
+      <div class="review-item"><div class="review-thumb" style="background:linear-gradient(135deg,#F0E4EC,#E4D4E0);">🥻</div><div style="flex:1;"><div class="review-item-name">Plaid Box Pleat Jumper × 1</div><div class="review-item-meta">Navy Plaid · Size 12 · 👧 Sofia</div></div><div class="review-item-price">$18.99</div></div>
+      <div class="review-item"><div class="review-thumb" style="background:linear-gradient(135deg,#EFEFEF,#E2E2E2);">👕</div><div style="flex:1;"><div class="review-item-name">Classic Piqué Polo × 2</div><div class="review-item-meta">White · Size 6 · 👦 Leo</div></div><div class="review-item-price">$29.98</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+      <div class="review-section"><div class="review-section-header"><div class="review-section-title">📦 Shipping</div><button class="review-edit" onclick="goToStep(2)">Edit</button></div><div class="review-info-block"><div class="review-info-label">Ship To</div><strong>Jennifer Torres</strong><br>142 Oak Ave, Newark NJ 07102<br><div style="margin-top:8px;"><div class="review-info-label">Method</div>USPS Priority · $7.40<br><span style="font-size:12px;color:var(--green);font-weight:600;" id="reviewShipEta">Est. Mar 7–8</span></div></div></div>
+      <div class="review-section"><div class="review-section-header"><div class="review-section-title">💳 Payment</div><button class="review-edit" onclick="goToStep(3)">Edit</button></div><div class="review-info-block"><div class="review-info-label">Card</div><strong>Visa ending in 4291</strong><br>Jennifer Torres · Exp 09/28<br><div style="margin-top:8px;"><div class="review-info-label">Billing</div>Same as shipping</div></div></div>
+    </div>
+    <div style="background:var(--white);border-radius:var(--radius);border:1.5px solid var(--gray-200);padding:22px 24px;box-shadow:var(--shadow-sm);">
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px;line-height:1.6;">By placing your order you agree to Galaxy Uniforms' <a href="#" style="color:var(--navy);font-weight:600;">Terms</a> and <a href="#" style="color:var(--navy);font-weight:600;">Privacy Policy</a>.</div>
+      <button class="continue-btn" id="placeBtn" onclick="placeOrder()" style="background:var(--green);font-size:17px;padding:17px;">✓ Place Order — <span id="finalTotal">$164.58</span></button>
+      <button class="back-link" onclick="goToStep(3)" style="justify-content:center;">← Back to Payment</button>
+    </div>
+  </div>
+
+  <!-- STEP 5 — CONFIRMATION -->
+  <div class="step-panel" id="panel5">
+    <div class="confirm-hero"><div class="confirm-stars"></div><div class="confirm-check">✓</div><div class="confirm-title">Order Confirmed!</div><div class="confirm-subtitle">Thank you, Jennifer! Your uniform order is on its way.</div><div class="confirm-order-num">Order #GU-20249102 · Confirmation sent to j.torres@email.com</div></div>
+    <div class="tracking-card">
+      <div class="tracking-header"><div class="tracking-title">📦 Order Status</div><span style="font-size:12px;font-weight:700;background:rgba(180,83,9,0.09);color:#B45309;padding:4px 10px;border-radius:6px;">Processing</span></div>
+      <div class="tracking-steps">
+        <div class="track-step done"><div class="track-dot">✓</div><div class="track-label">Order<br>Placed</div></div>
+        <div class="track-step done"><div class="track-dot">✓</div><div class="track-label">Payment<br>Confirmed</div></div>
+        <div class="track-step pending"><div class="track-dot">🧵</div><div class="track-label">Embroidery<br>In Progress</div></div>
+        <div class="track-step pending"><div class="track-dot">📦</div><div class="track-label">Packed &<br>Shipped</div></div>
+        <div class="track-step pending"><div class="track-dot">🏠</div><div class="track-label">Delivered<br>Mar 7–8</div></div>
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:var(--gray-500);">🔔 Shipping confirmation with tracking # will be emailed when your order ships. Expected: <strong>March 6, 2026</strong></div>
+    </div>
+    <div class="confirm-cards">
+      <div class="confirm-card"><div class="confirm-card-label">📦 Shipping To</div><div class="confirm-card-content"><strong>Jennifer Torres</strong><br>142 Oak Avenue<br>Newark, NJ 07102<br><span style="color:var(--green);font-weight:600;">USPS Priority · Mar 7–8</span></div></div>
+      <div class="confirm-card"><div class="confirm-card-label">💳 Payment</div><div class="confirm-card-content"><strong>Visa ending in 4291</strong><br>Amount: <strong>$164.58</strong><br>Auth: 8X4K21<br><span style="color:var(--green);font-weight:600;">✓ Successful</span></div></div>
+      <div class="confirm-card"><div class="confirm-card-label">🧵 Embroidery</div><div class="confirm-card-content">3× Classic Polo Navy<br>St. Mary's Academy crest<br>Code: EMB-SMA-001<br><span style="color:#B45309;font-weight:600;">In queue</span></div></div>
+      <div class="confirm-card"><div class="confirm-card-label">🏫 School</div><div class="confirm-card-content"><strong>St. Mary's Academy</strong><br>Newark, NJ<br>All items school-approved<br><span style="color:var(--green);font-weight:600;">✓ Verified</span></div></div>
+    </div>
+    <div class="rewards-earn"><div class="rewards-icon">⭐</div><div class="rewards-text"><strong>You earned 164 Galaxy Points!</strong><span>New balance: 164 pts. <a href="galaxy-uniforms-account.html" style="color:var(--navy);font-weight:700;">View Account →</a></span></div></div>
+    <div style="background:var(--white);border-radius:var(--radius);border:1.5px solid var(--gray-200);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow-sm);">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;">🔔 Set a Back-to-School Reminder?</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">We'll text you in July 2026 when it's time to re-order — with sizes auto-adjusted for growth.</div>
+      <div style="display:flex;gap:8px;"><input class="field-input" type="tel" value="(201) 555-0142" style="flex:1;height:38px;padding:8px 12px;font-size:13px;"><button style="background:var(--navy);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;" onclick="showToast('📅 Reminder set for July 2026!')">Set Reminder</button></div>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn secondary" onclick="window.location='galaxy-uniforms-account.html'">📋 View Order Details</button>
+      <button class="confirm-btn primary" onclick="window.location='galaxy-uniforms-homepage.html'">🛍 Continue Shopping</button>
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY SIDEBAR -->
+  <div class="summary-sticky" id="summaryCol">
+    <div class="summary-card">
+      <div class="summary-header" onclick="toggleSummary()">
+        <div class="summary-title">🛒 Order Summary <span style="background:var(--navy);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:7px;">7</span></div>
+        <span class="summary-toggle" id="summaryToggle">▲ Hide</span>
+      </div>
+      <div id="summaryItems" class="summary-items">
+        <div class="summary-item"><div class="si-thumb" style="background:linear-gradient(135deg,#D0D8EC,#BEC8DC);">👕<span class="si-qty">3</span></div><div><div class="si-name">Classic Piqué Polo</div><div class="si-meta">Navy · Sz 10 · 🧵 Emb.</div></div><div class="si-price">$40.47</div></div>
+        <div class="summary-item"><div class="si-thumb" style="background:linear-gradient(135deg,#EDE8DC,#E0D8C8);">👖<span class="si-qty">1</span></div><div><div class="si-name">Twill Pants</div><div class="si-meta">Khaki · Sz 10S</div></div><div class="si-price">$14.99</div></div>
+        <div class="summary-item"><div class="si-thumb" style="background:linear-gradient(135deg,#EEE8F4,#E4DCF0);">👚<span class="si-qty">2</span></div><div><div class="si-name">Stretch Blouse</div><div class="si-meta">White · Sz 12</div></div><div class="si-price">$33.98</div></div>
+        <div class="summary-item"><div class="si-thumb" style="background:linear-gradient(135deg,#F0E4EC,#E4D4E0);">🥻<span class="si-qty">1</span></div><div><div class="si-name">Plaid Jumper</div><div class="si-meta">Navy Plaid · Sz 12</div></div><div class="si-price">$18.99</div></div>
+        <div class="summary-item"><div class="si-thumb" style="background:linear-gradient(135deg,#EFEFEF,#E2E2E2);">👕<span class="si-qty">2</span></div><div><div class="si-name">Classic Polo White</div><div class="si-meta">White · Sz 6</div></div><div class="si-price">$29.98</div></div>
+      </div>
+      <div class="summary-body">
+        <div class="sum-row"><span class="sum-row-label">Subtotal (7 items)</span><span class="sum-row-val">$138.41</span></div>
+        <div class="sum-row savings"><span class="sum-row-label">Volume discount</span><span class="sum-row-val">−$4.50</span></div>
+        <div class="sum-row"><span class="sum-row-label">Embroidery (3 items)</span><span class="sum-row-val">$20.97</span></div>
+        <div class="sum-row"><span class="sum-row-label" id="shipLabel">Shipping (USPS Priority)</span><span class="sum-row-val" id="shipVal">$7.40</span></div>
+        <div class="sum-row"><span class="sum-row-label">Tax (NJ 6.625%)</span><span class="sum-row-val">$10.70</span></div>
+        <div class="sum-row savings" id="rewardsRow"><span class="sum-row-label">Galaxy Rewards</span><span class="sum-row-val">−$8.40</span></div>
+        <div class="sum-row savings" id="promoRow" style="display:none;"><span class="sum-row-label">Promo (SCHOOL10)</span><span class="sum-row-val">−$13.84</span></div>
+        <hr class="sum-divider">
+        <div class="sum-total-row"><span class="sum-total-label">Total</span><span class="sum-total-val" id="totalVal">$164.58</span></div>
+        <div class="sum-tax-note">Taxes included · Free returns · 30-day guarantee</div>
+      </div>
+      <div class="trust-list">
+        <div class="trust-item">🔒 SSL encrypted · 100% secure</div>
+        <div class="trust-item">🔄 Free returns within 30 days</div>
+        <div class="trust-item">📏 Free size exchange</div>
+        <div class="trust-item">📦 Ships in 1–2 business days</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"><span>✓</span><span id="toastMsg">Done!</span></div>
+
+<script>
+  let currentStep = 2;
+  let summaryOpen = true;
+  let rewardsOn = true;
+  let promoOn = false;
+
+  function goToStep(n) {
+    document.getElementById('panel' + currentStep).classList.remove('active');
+    currentStep = n;
+    document.getElementById('panel' + n).classList.add('active');
+    for (let i = 1; i <= 5; i++) {
+      const s = document.getElementById('step' + i);
+      const num = s.querySelector('.step-num');
+      s.classList.remove('active','done');
+      if (i < n) { s.classList.add('done'); num.textContent = '✓'; }
+      else if (i === n) { s.classList.add('active'); num.textContent = i; }
+      else { num.textContent = i; }
+      if (i < 5) {
+        const c = document.getElementById('conn' + i);
+        if (c) c.classList.toggle('done', i < n);
+      }
+    }
+    if (n === 5) document.getElementById('summaryCol').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function placeOrder() {
+    const btn = document.getElementById('placeBtn');
+    btn.textContent = '⏳ Processing payment...';
+    btn.disabled = true; btn.style.background = '#9CA3AF';
+    setTimeout(() => {
+      btn.textContent = '✓ Payment confirmed!';
+      btn.style.background = 'var(--green)';
+      setTimeout(() => goToStep(5), 700);
+    }, 1800);
+  }
+
+  function selectShip(el, type, price, label) {
+    document.querySelectorAll('.ship-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('shipVal').textContent = price;
+    document.getElementById('shipLabel').textContent = 'Shipping (' + label + ')';
+    recalc();
+  }
+
+  function toggleCB(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('checked');
+    if (id === 'rewardsUse') { rewardsOn = el.classList.contains('checked'); recalc(); }
+  }
+
+  function applyPromo() {
+    const code = document.getElementById('promoIn').value.trim().toUpperCase();
+    if (code === 'SCHOOL10' || code === 'GALAXY10') {
+      promoOn = true;
+      document.getElementById('promoRow').style.display = 'flex';
+      document.getElementById('promoApplied').style.display = 'flex';
+      document.getElementById('promoIn').value = '';
+      recalc(); showToast('🎉 Promo applied!');
+    } else { showToast(code ? 'Invalid code. Try SCHOOL10' : 'Enter a code'); }
+  }
+
+  function removePromo() {
+    promoOn = false;
+    document.getElementById('promoRow').style.display = 'none';
+    document.getElementById('promoApplied').style.display = 'none';
+    recalc();
+  }
+
+  function recalc() {
+    const sv = document.getElementById('shipVal').textContent;
+    const ship = sv === 'FREE' ? 0 : parseFloat(sv.replace('$',''));
+    const rewards = rewardsOn ? 8.40 : 0;
+    const promo = promoOn ? 13.84 : 0;
+    const total = (138.41 - 4.50 + 20.97 + ship + 10.70 - rewards - promo).toFixed(2);
+    document.getElementById('totalVal').textContent = '$' + total;
+    document.getElementById('finalTotal').textContent = '$' + total;
+  }
+
+  function toggleSummary() {
+    summaryOpen = !summaryOpen;
+    document.getElementById('summaryItems').style.display = summaryOpen ? '' : 'none';
+    document.getElementById('summaryToggle').textContent = summaryOpen ? '▲ Hide' : '▼ Show';
+  }
+
+  function setPayTab(btn) {
+    document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
